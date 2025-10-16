@@ -48,7 +48,7 @@ def get_data(filters):
 						
     SUM(ppi.quantitydz*ppi.rate),
 	0,
-	SUM(ppi.quantitydz)*ppi.rate-0					
+	SUM(ppi.quantitydz*ppi.rate)-0					
 	 FROM
             `tabContract Worker Salary Slip` cwss
             JOIN `tabProduction Pay Items` ppi ON cwss.name = ppi.parent
