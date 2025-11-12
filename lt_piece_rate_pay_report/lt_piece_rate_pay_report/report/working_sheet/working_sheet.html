@@ -1,0 +1,197 @@
+{%
+	var report_columns = report.get_columns_for_print();
+	report_columns = report_columns.filter(col => !col.hidden);
+
+	if (report_columns.length > 80) {
+		frappe.throw(__("Too many columns. Export the report and print it using a spreadsheet application."));
+	}
+%}
+
+
+
+<style>
+    @page {
+        size: A4 portrait;
+        margin: 5px;
+    }
+
+    body {
+        font-size: 8px; 
+    }
+
+    .container {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 9px; 
+    }
+
+    .table td, .table th {
+        padding: 1px;
+        border: 1px solid black;
+        white-space: nowrap; 
+        text-align: center;
+    }
+
+    .table2 {
+        width: 45%; 
+        font-size: 8px;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .text-right {
+        text-align: right;
+    }
+
+    .summary-section {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    font: 10px;
+    }
+
+
+    .footer {
+    position: absolute;
+    bottom: 5px;
+    left: 0;
+    right: 0;
+    font-size: 8px;
+    }
+
+    .text-right{
+        font: 8px;
+    }
+
+.page-break {
+    page-break-after: always;
+    margin-bottom: 10px;
+}
+
+
+</style>
+
+
+
+<!-- <h3 class="text-center">{%= __(report.report_name) %}</h3> -->
+<!-- <h3 class="text-center">{%= filters.company %}</h3> -->
+<!-- <h4 class="text-center">{%= filters.employee %}</h4> -->
+<!-- <h3 class="text-center">{%= filters.date %}</h3>
+<h3 class="text-center">{%= filters.status %}</h3> -->
+
+
+
+<!-- {% let emp_name =  data[0].first_name  %}  
+<h1>{{ emp_name }}</h1> -->
+
+
+
+
+        
+
+{% 
+    const max_buyers_per_page = 4;
+    const buyer_groups = [];
+    for (let i = 2; i < report_columns.length; i += (max_buyers_per_page * 4)) {
+        buyer_groups.push(report_columns.slice(i, i + (max_buyers_per_page * 4)));
+    }
+%}
+
+{% for (let g = 0; g < buyer_groups.length; g++) { %}
+<div class="page-break">
+    <table class="table table-bordered">
+        <thead>
+            {% if (g === 0) { %}
+            <tr><th class="text-center" colspan="18"><font size="+1">{%= __(report.report_name) %}</font></th></tr>
+
+            <tr>
+                {% if (!is_null(filters.start_date)) { %}
+                    <th class="text-left" colspan="5"><font size="+.5">Start Date: {%= filters.start_date %}</font></th>
+                {% } %}
+                {% if (!is_null(filters.end_date)) { %}
+                    <th class="text-left" colspan="5"><font size="+.5">End Date: {%= filters.end_date %}</font></th>
+                {% } %}
+                {% if (!is_null(filters.floor)) { %}
+                    <th class="text-left" colspan="4"><font size="+.5">Floor: {%= filters.floor %}</font></th>
+                {% } %}
+                {% if (!is_null(filters.line)) { %}
+                    <th class="text-left" colspan="4"><font size="+.5">Line: {%= filters.line %}</font></th>
+                {% } %}
+            </tr>
+            {% } %}
+
+            <tr>
+                <th></th>
+                <th></th>
+                {% for (let i = 0; i < buyer_groups[g].length; i += 4) { %}
+                    <th class="text-center" colspan="4">
+                        Buyer: {%= buyer_groups[g][i].label.split("$")[0] %}
+                    </th>
+                {% } %}
+            </tr>
+
+            <tr>
+                <th></th>
+                <th></th>
+                {% for (let i = 0; i < buyer_groups[g].length; i += 4) { %}
+                    <th class="text-center" colspan="4">
+                        {%= buyer_groups[g][i].label.split("$")[1] %}
+                    </th>
+                {% } %}
+            </tr>
+            <tr>
+                <th></th>
+                <th></th>
+                {% for (let i = 0; i < buyer_groups[g].length; i += 4) { %}
+                    <th>
+                        Total: {%= buyer_groups[g][i].label.split("$")[2] %}
+                    </th>
+                    <th class="text-center" colspan="2">
+                        Complete: {%= buyer_groups[g][i].label.split("$")[3] || 0 %}
+                    </th>
+                    <th>
+                        Bill: {%= buyer_groups[g][i].label.split("$")[4] %}
+                    </th>
+                {% } %}
+            </tr>
+
+            <tr>
+                {% for (let i = 0; i < 2; i++) { %}
+                    <th class="text-center">{%= report_columns[i].label %}</th>
+                {% } %}
+                {% for (let i = 0; i < buyer_groups[g].length; i++) { %}
+                    <th class="text-center">
+                        {%= buyer_groups[g][i].label.split("$").slice(-1)[0] %}
+                    </th>
+                {% } %}
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for(let j=0; j<data.length; j++) { %}
+                <tr>
+                    {% const row = data[j]; %}
+                    {% for (let i = 0; i < 2; i++) { %}
+                        <td class="text-center">
+                            {%= frappe.format(row[report_columns[i].fieldname], report_columns[i], {}, row) %}
+                        </td>
+                    {% } %}
+                    {% for (let i = 0; i < buyer_groups[g].length; i++) { %}
+                        <td class="text-center">
+                            {% const col = buyer_groups[g][i]; %}
+                            {%= frappe.format(row[col.fieldname], col, {}, row) %}
+                        </td>
+                    {% } %}
+                </tr>
+            {% } %}
+        </tbody>
+    </table>
+</div>
+{% } %}
