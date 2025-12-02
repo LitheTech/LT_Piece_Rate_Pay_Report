@@ -97,10 +97,10 @@
         
 
 {% 
-    const max_buyers_per_page = 4;
+    const max_buyers_per_page = 3;
     const buyer_groups = [];
-    for (let i = 2; i < report_columns.length; i += (max_buyers_per_page * 4)) {
-        buyer_groups.push(report_columns.slice(i, i + (max_buyers_per_page * 4)));
+    for (let i = 2; i < report_columns.length; i += (max_buyers_per_page * 8)) {
+        buyer_groups.push(report_columns.slice(i, i + (max_buyers_per_page * 8)));
     }
 %}
 
@@ -109,48 +109,65 @@
     <table class="table table-bordered">
         <thead>
             {% if (g === 0) { %}
-            <tr><th class="text-center" colspan="18"><font size="+1">{%= __(report.report_name) %}</font></th></tr>
+                <tr><th class="text-center" colspan="18"><font size="+1">{%= __(report.report_name) %}</font></th></tr>
 
-            <tr>
-                {% if (!is_null(filters.start_date)) { %}
-                    <th class="text-left" colspan="5"><font size="+.5">Start Date: {%= filters.start_date %}</font></th>
-                {% } %}
-                {% if (!is_null(filters.end_date)) { %}
-                    <th class="text-left" colspan="5"><font size="+.5">End Date: {%= filters.end_date %}</font></th>
-                {% } %}
-                {% if (!is_null(filters.floor)) { %}
-                    <th class="text-left" colspan="4"><font size="+.5">Floor: {%= filters.floor %}</font></th>
-                {% } %}
-                {% if (!is_null(filters.line)) { %}
-                    <th class="text-left" colspan="4"><font size="+.5">Line: {%= filters.line %}</font></th>
-                {% } %}
-            </tr>
+                <tr>
+                    {% if (!is_null(filters.start_date)) { %}
+                        <th class="text-center" colspan="4"><font size="+.5">Start Date: {%= filters.start_date %}</font></th>
+                    {% } %}
+                    {% if (!is_null(filters.end_date)) { %}
+                        <th class="text-center" colspan="4"><font size="+.5">End Date: {%= filters.end_date %}</font></th>
+                    {% } %}
+                    {% if (!is_null(filters.floor)) { %}
+                        <th class="text-center" colspan="3"><font size="+.5">Floor: {%= filters.floor %}</font></th>
+                    {% } %}
+                    {% if (!is_null(filters.line)) { %}
+                        <th class="text-center" colspan="3"><font size="+.5">Line: {%= filters.line %}</font></th>
+                    {% } %}
+                    <!-- {% if (!is_null(filters.process_type)) { %}
+                        <th class="text-center" colspan="3"><font size="+.5">Process Type: {%= filters.process_type %}</font></th>
+                    {% } %} -->
+                </tr>
+
+                <tr>
+                    {% if (!is_null(filters.process_type)) { %}
+                        <th class="text-center" colspan="3"><font size="+.5">Process Type: {%= filters.process_type %}</font></th>
+                    {% } %}
+
+                    <!-- {% if (!is_null(filters.process)) { %}
+                        <th class="text-center" colspan="3"><font size="+.5">Process: {%= filters.process %}</font></th>
+                    {% } %} -->
+
+                </tr>
             {% } %}
 
             <tr>
                 <th></th>
                 <th></th>
-                {% for (let i = 0; i < buyer_groups[g].length; i += 4) { %}
-                    <th class="text-center" colspan="4">
+                {% for (let i = 0; i < buyer_groups[g].length; i += 8) { %}
+                    <th class="text-center" colspan="5">
                         Buyer: {%= buyer_groups[g][i].label.split("$")[0] %}
                     </th>
                 {% } %}
+                <th></th>
             </tr>
 
             <tr>
                 <th></th>
                 <th></th>
-                {% for (let i = 0; i < buyer_groups[g].length; i += 4) { %}
-                    <th class="text-center" colspan="4">
+                {% for (let i = 0; i < buyer_groups[g].length; i += 8) { %}
+                    <th class="text-center" colspan="5">
                         {%= buyer_groups[g][i].label.split("$")[1] %}
                     </th>
                 {% } %}
+                <th></th>
             </tr>
+
             <tr>
                 <th></th>
                 <th></th>
-                {% for (let i = 0; i < buyer_groups[g].length; i += 4) { %}
-                    <th>
+                {% for (let i = 0; i < buyer_groups[g].length; i += 8) { %}
+                    <th class="text-center" colspan="2">
                         Total: {%= buyer_groups[g][i].label.split("$")[2] %}
                     </th>
                     <th class="text-center" colspan="2">
@@ -160,6 +177,7 @@
                         Bill: {%= buyer_groups[g][i].label.split("$")[4] %}
                     </th>
                 {% } %}
+                <th></th>
             </tr>
 
             <tr>
@@ -167,31 +185,104 @@
                     <th class="text-center">{%= report_columns[i].label %}</th>
                 {% } %}
                 {% for (let i = 0; i < buyer_groups[g].length; i++) { %}
-                    <th class="text-center">
-                        {%= buyer_groups[g][i].label.split("$").slice(-1)[0] %}
-                    </th>
+
+                    {% let pos = i % 8; %}
+
+                    {% if (pos < 5) { %}
+                        <th class="text-center">
+                            {%= buyer_groups[g][i].label.split("$").slice(-1)[0] %}
+                        </th>
+                    {% } %}
+
                 {% } %}
+                <th>Total Sum</th>
+
             </tr>
+           
         </thead>
 
         <tbody>
-            {% for(let j=0; j<data.length; j++) { %}
-                <tr>
-                    {% const row = data[j]; %}
-                    {% for (let i = 0; i < 2; i++) { %}
-                        <td class="text-center">
-                            {%= frappe.format(row[report_columns[i].fieldname], report_columns[i], {}, row) %}
-                        </td>
-                    {% } %}
-                    {% for (let i = 0; i < buyer_groups[g].length; i++) { %}
+            {% for (let j = 0; j < data.length-1; j++) { %}
+            <tr>
+                {% const row = data[j]; %}
+
+                <!-- print first 2 fixed columns -->
+                {% for (let i = 0; i < 2; i++) { %}
+                    <td class="text-center">
+                        {%= frappe.format(row[report_columns[i].fieldname], report_columns[i], {}, row) %}
+                    </td>
+                {% } %}
+
+                {% let total_val = 0; %}
+
+                <!-- print grouped buyer columns but hide last 3 of each 8 -->
+                {% for (let i = 0; i < buyer_groups[g].length; i++) { %}
+
+                    {% let pos = i % 8; %}  
+                    {% if (pos < 5) { %}  
                         <td class="text-center">
                             {% const col = buyer_groups[g][i]; %}
                             {%= frappe.format(row[col.fieldname], col, {}, row) %}
                         </td>
                     {% } %}
-                </tr>
+
+                    {% if (pos == 7) { %} 
+                        {% const col = buyer_groups[g][i]; %}
+                        {% let val = flt(row[col.fieldname]); %}
+                        {%= val %}
+                        {% total_val += val; %}
+                    {% } %}
+
+                {% } %}
+
+                <td class="text-center">
+                    {%= total_val %}
+                </td>
+
+            </tr>
+            {% } %}
+            
+
+<!-- for Total Row -->
+            {% for (let j = data.length-1; j < data.length; j++) { %}
+            <tr>
+                {% const row = data[j]; %}
+                
+                {% for (let i = 0; i < 2; i++) { %}
+                    <td class="text-center">Total </td>
+                {% } %}
+                                    
+                {% let total_val = 0; %}
+
+            
+                {% for (let i = 3; i < buyer_groups[g].length; i++) { %} 
+                    
+                    {% let pos = i % 8; %}  
+                    
+                    {% if (pos > 2) { %} 
+                    <td class="text-center"> 
+                        {% const col = buyer_groups[g][i]; %} 
+                        {%= frappe.format(row[col.fieldname], col, {}, row) %} 
+                    </td> 
+                    {% } %}
+                    
+                    {% if (pos == 7) { %} 
+                        {% const col = buyer_groups[g][i]; %}
+                        {% let val = flt(row[col.fieldname]); %}
+                        {%= val %}
+                        {% total_val += val; %}
+                    {% } %}
+
+                {% } %}
+
+                <td class="text-center">
+                    {%= total_val %}
+                </td>
+            </tr>
+            
             {% } %}
         </tbody>
+
     </table>
 </div>
 {% } %}
