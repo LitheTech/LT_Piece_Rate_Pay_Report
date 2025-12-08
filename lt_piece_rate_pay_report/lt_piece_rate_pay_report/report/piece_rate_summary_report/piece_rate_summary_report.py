@@ -21,31 +21,62 @@ def get_columns():
         {"label": "Net Amount", "fieldname": "net_amount", "fieldtype": "Currency", "width": 150},
         {"label": "Advance", "fieldname": "advance", "fieldtype": "Currency", "width": 150},
         {"label": "Payable After Deduct", "fieldname": "payable_after_deduct", "fieldtype": "Currency", "width": 150},
+        {"label": "SIGNATURE", "fieldname": "singature", "fieldtype": "Data", "width": 150},
 
     ]
 
 
 def get_data(filters):
-    conditions = ""
-    if filters.get("contract_worker_payroll_entry"):
-        # conditions["contract_worker_payroll_entry"] = filters.get("contract_worker_payroll_entry")
-        conditions += " contract_worker_payroll_entry= '%s'" % filters["contract_worker_payroll_entry"]
+
+    conditions, filters = get_conditions(filters)
+
+    # conditions = ""
+    # if filters.get("contract_worker_payroll_entry"):
+    #     # conditions["contract_worker_payroll_entry"] = filters.get("contract_worker_payroll_entry")
+    #     conditions += " contract_worker_payroll_entry= '%s'" % filters["contract_worker_payroll_entry"]
 
 
     slips = frappe.db.sql("""
     SELECT 
-        employee, 
-        employee_name, 
+        cwss.employee, 
+        cwss.employee_name, 
         
-        total_amount AS amount_payable,
-        10 as stamp_ded,
-        total_amount-10 AS net_amount,
-        0 as advance,
-        total_amount-10-0 As payable_after_deduct
+        SUM(ppi.quantitydz*ppi.rate) AS amount_payable,
+        cwss.tax as stamp_ded,
+        SUM(ppi.quantitydz*ppi.rate)-cwss.tax AS net_amount,
+        cwss.advance as advance,
+        SUM(ppi.quantitydz*ppi.rate)-cwss.advance-cwss.tax As payable_after_deduct
                                           
-    FROM `tabContract Worker Salary Slip`
+    FROM
+            `tabContract Worker Salary Slip` cwss
+            JOIN `tabProduction Pay Items` ppi ON cwss.name = ppi.parent
     WHERE %s and total_amount>0
+                          group by cwss.employee
 	"""%conditions, as_dict=True)
 
 
     return slips
+
+
+def get_conditions(filters):
+    conditions = "1=1"
+
+    if filters.get("contract_worker_payroll_entry"):
+        conditions += " and cwss.contract_worker_payroll_entry= '%s'" % filters["contract_worker_payroll_entry"]
+
+    if filters.get("floor"):
+        conditions += " AND ppi.floor = '%s'" % filters["floor"]
+
+    if filters.get("line"):
+        conditions += " AND ppi.line = '%s'" % filters["line"]
+
+    if filters.get("buyer"):
+        conditions += " AND ppi.buyer = '%s'" % filters["buyer"]
+
+    # if filters.get("process_type"):
+    #     conditions += " AND ppi.process_type = '%s'" % filters["process_type"]
+
+    # if filters.get("process"):
+        # conditions += " AND dpd.process= '%s'" % filters["process"]
+
+    return conditions, filters
