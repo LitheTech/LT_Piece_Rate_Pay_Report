@@ -56,6 +56,12 @@ def get_data(filters):
 		 %s
 	GROUP BY
 		ppi.buyer, ppi.po, ppi.process_type, ppi.style
+	ORDER BY FIELD(
+        ppi.process_type,
+        'cutting',
+        'sewing',
+        'iron'
+    )
 						
 """ 
 	% conditions, as_list=1)
