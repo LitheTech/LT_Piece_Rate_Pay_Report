@@ -1,0 +1,78 @@
+# Copyright (c) 2025, Lithe-Tech LTD and contributors
+# For license information, please see license.txt
+
+import frappe
+from frappe import _
+
+
+def execute(filters=None):
+
+	if not filters:
+		filters = {}
+
+	columns = get_columns()
+	data = get_data(filters)
+	
+	return columns, data
+
+def get_columns():
+	return [
+        _("Process Type") + ":Data:90",
+        # _("Buyer") + ":Data:200",
+        # _("Po") + ":Data:200",
+        # _("Style") + ":Data:90",
+        # _("Sales Contract") + ":Data:200",
+        _("Bill Qty (pcs)") + ":Int:100",
+        _("Bill Qty(Dzn)") + ":Float:100",
+		_("Pcs Rate") + ":Float:100",
+		_("Bill") + ":Int:100",
+
+        _("Stamp Deduct") + ":Int:100",
+		_("Total Bill") + ":Int:100",
+
+    ]
+
+def get_data(filters):
+
+	conditions, filters = get_conditions(filters)
+
+
+	result = frappe.db.sql("""SELECT
+	ppi.process_type,
+    
+    SUM(ppi.quantity),
+	SUM(ppi.quantitydz),
+	SUM(ppi.quantitydz*ppi.rate)/SUM(ppi.quantitydz),
+						
+    SUM(ppi.quantitydz*ppi.rate),
+	10,
+	SUM(ppi.quantitydz*ppi.rate)-10					
+	 FROM
+            `tabContract Worker Salary Slip` cwss
+            JOIN `tabProduction Pay Items` ppi ON cwss.name = ppi.parent
+	where
+		 %s
+	GROUP BY
+		ppi.process_type
+	ORDER BY FIELD(
+        ppi.process_type,
+        'cutting',
+        'sewing',
+        'iron'
+    )
+						
+""" 
+	% conditions, as_list=1)
+
+	return result
+
+def get_conditions(filters):
+	conditions="" 
+	if filters.get("contract_worker_payroll_entry"): conditions += "cwss.contract_worker_payroll_entry= '%s'" % filters["contract_worker_payroll_entry"]
+	if filters.get("employee_type"): conditions += "and cwss.employee_type= '%s'" % filters["employee_type"]
+	if filters.get("floor"): conditions += " AND ppi.floor = '%s'" % filters["floor"]
+	if filters.get("line"): conditions += " AND ppi.facility_or_line = '%s'" % filters["line"]
+	if filters.get("buyer"): conditions += " AND ppi.buyer = '%s'" % filters["buyer"]
+	if filters.get("process_type"): conditions += " AND ppi.process_type = '%s'" % filters["process_type"]
+
+	return conditions, filters
