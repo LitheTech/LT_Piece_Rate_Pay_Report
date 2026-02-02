@@ -17,14 +17,16 @@ def execute(filters=None):
 
 def get_columns():
 	return [
-        # _("Production Date") + ":Data:90",
-        # _("Color") + ":Data:200",
-        _("Process Type") + ":Data:200",
+        _("Production Date") + ":Data:130",
+        _("Color") + ":Data:150",
+        _("Process Type") + ":Data:100",
+		_("Floor") + ":Data:70",
+		_("Line") + ":Data:50",
         # _("Style") + ":Data:90",
         # _("Sales Contract") + ":Data:200",
         _("Total Qty") + ":Int:100",
         _("Completed Qty") + ":Int:100",
-		# _("Bill Qty") + ":Int:100",
+		_("Bill Qty") + ":Int:100",
 		_("Remain Qty") + ":Int:100",
 
         # _("Stamp Deduct") + ":Int:100",
@@ -38,28 +40,20 @@ def get_data(filters):
 
 
 	result = frappe.db.sql("""
- SELECT
-    process_type,
-    total_quantity,
-    completed_qty,
-    remaining_qty
-FROM (
-    SELECT
-        dp.process_type,
-        dp.total_quantity,
-        dp.completed_quantity + dp.bill_quantity AS completed_qty,
-        dp.total_quantity - dp.completed_quantity - dp.bill_quantity AS remaining_qty,
-        ROW_NUMBER() OVER (
-            PARTITION BY dp.process_type
-            ORDER BY (dp.completed_quantity + dp.bill_quantity) DESC
-        ) AS rn
-    FROM `tabDaily Production` dp
-    WHERE %s
-) x
-WHERE rn = 1
-ORDER BY FIELD(process_type, 'cutting', 'sewing', 'iron');
-
-
+        SELECT 
+            dp.production_date,
+            dp.color,
+            dp.process_type,
+			dp.floor,
+			dp.facility_or_line,
+            dp.total_quantity,
+            dp.completed_quantity,
+            dp.bill_quantity,
+			dp.total_quantity-dp.completed_quantity-dp.bill_quantity
+            
+        FROM `tabDaily Production` dp
+        WHERE %s
+		ORDER BY FIELD(process_type, 'cutting', 'sewing', 'iron');
     """ % conditions, as_list=1)
 
 	return result

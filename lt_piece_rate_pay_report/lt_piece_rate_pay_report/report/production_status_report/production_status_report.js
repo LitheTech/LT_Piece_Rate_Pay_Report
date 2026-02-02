@@ -20,7 +20,7 @@ frappe.query_reports["Production Status Report"] = {
             fieldname: "style_list",
             label: __("Style"),
             fieldtype: "Select",
-                        reqd: 1,
+            reqd: 1,
             on_change: function () {
                 frappe.query_report.set_filter_value("color", "");
                 load_colors();
