@@ -195,7 +195,7 @@ def get_conditions(filters):
     if filters.get("process_type"):
         conditions += " AND dp.process_type = '%s'" % filters["process_type"]
 
-    # if filters.get("process"):
-        # conditions += " AND dpd.process= '%s'" % filters["process"]
+    if filters.get("company"):
+        conditions += " AND dp.company= '%s'" % filters["company"]
 
     return conditions, filters

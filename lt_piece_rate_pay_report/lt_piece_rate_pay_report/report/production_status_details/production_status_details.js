@@ -31,7 +31,38 @@ frappe.query_reports["Production Status Details"] = {
 			fieldname: "color",
 			label: __("Color"),
 			fieldtype: "Select"
-		}
+		},
+		{
+			"fieldname": "process_type",
+			"fieldtype": "Link",
+			"label": "Process Type",
+			"mandatory": 0,
+			"options": "Process Type",
+			"wildcard_filter": 0
+		},
+		{
+			"fieldname": "floor",
+			"fieldtype": "Link",
+			"label": "Floor",
+			"mandatory": 0,
+			"options": "Floor",
+			"wildcard_filter": 0
+		},
+        {
+			"fieldname": "line",
+			"fieldtype": "Link",
+			"label": "Line",
+			"mandatory": 0,
+			"options": "Facility or Line",
+			"wildcard_filter": 0
+		},
+		{
+			"fieldname":"company",
+			"label": __("Company"),
+			"fieldtype": "Link",
+			"options": "Company",
+			"default": frappe.defaults.get_user_default("Company"),
+		},
 	]
 };
 

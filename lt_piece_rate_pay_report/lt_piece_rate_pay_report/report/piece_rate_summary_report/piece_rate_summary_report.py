@@ -72,6 +72,9 @@ def get_conditions(filters):
 
     if filters.get("buyer"):
         conditions += " AND ppi.buyer = '%s'" % filters["buyer"]
+    
+    if filters.get("company"): conditions += " AND cwss.company = '%s'" % filters["company"]
+
 
     # if filters.get("process_type"):
     #     conditions += " AND ppi.process_type = '%s'" % filters["process_type"]

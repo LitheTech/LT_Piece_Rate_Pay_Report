@@ -72,6 +72,14 @@ frappe.query_reports["Top Sheet"] = {
 			"options": "Process Type",
 			"wildcard_filter": 0
 		},
+		{
+			"fieldname":"company",
+			"label": __("Company"),
+			"fieldtype": "Link",
+			"options": "Company",
+			"default": frappe.defaults.get_user_default("Company"),
+			"reqd": 1
+		},
 
 
 	]

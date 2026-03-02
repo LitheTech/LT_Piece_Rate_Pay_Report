@@ -63,8 +63,12 @@ def get_conditions(filters):
 	if filters.get("po_list"):conditions += " AND dp.po = '%s'" % filters["po_list"]
 	if filters.get("style_list"):conditions += " AND dp.style_list = '%s'" % filters["style_list"]
 	if filters.get("color"):conditions += " AND dp.color LIKE CONCAT('%%', {0}, '%%')".format(
-        	frappe.db.escape(filters["color"])
-    	)
+		frappe.db.escape(filters["color"])
+	)
+	if filters.get("process_type"):conditions += " AND dp.process_type = '%s'" % filters["process_type"]
+	if filters.get("floor"):conditions += " AND dp.floor = '%s'" % filters["floor"]
+	if filters.get("line"):conditions += " AND dp.facility_or_line = '%s'" % filters["line"]
+	if filters.get("company"): conditions += " AND dp.company = '%s'" % filters["company"]
 	return conditions, filters
 
 
