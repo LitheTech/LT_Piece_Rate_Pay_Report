@@ -40,20 +40,22 @@ def get_data(filters):
 	result = frappe.db.sql("""
  SELECT
     process_type,
-    total_quantity,
+    color_quantity,
     completed_qty,
     remaining_qty
 FROM (
     SELECT
         dp.process_type,
-        dp.total_quantity,
-        dp.completed_quantity + dp.bill_quantity AS completed_qty,
-        dp.total_quantity - dp.completed_quantity - dp.bill_quantity AS remaining_qty,
+        dpc.color_quantity,
+        dpc.done_quantity + dpc.ongoing_quantity AS completed_qty,
+        dpc.color_quantity - dpc.done_quantity - dpc.ongoing_quantity AS remaining_qty,
         ROW_NUMBER() OVER (
             PARTITION BY dp.process_type
-            ORDER BY (dp.completed_quantity + dp.bill_quantity) DESC
+            ORDER BY (dpc.done_quantity + dpc.ongoing_quantity) DESC
         ) AS rn
     FROM `tabDaily Production` dp
+    JOIN `tabDaily Production Colors` dpc 
+        ON dpc.parent = dp.name
     WHERE %s
 ) x
 WHERE rn = 1
@@ -68,9 +70,7 @@ def get_conditions(filters):
 	conditions="1=1" 
 	if filters.get("po_list"):conditions += " AND dp.po = '%s'" % filters["po_list"]
 	if filters.get("style_list"):conditions += " AND dp.style_list = '%s'" % filters["style_list"]
-	if filters.get("color"):conditions += " AND dp.color LIKE CONCAT('%%', {0}, '%%')".format(
-        	frappe.db.escape(filters["color"])
-    	)
+	if filters.get("color"):conditions += " AND dpc.color ='%s'" % filters["color"]
 	return conditions, filters
 
 

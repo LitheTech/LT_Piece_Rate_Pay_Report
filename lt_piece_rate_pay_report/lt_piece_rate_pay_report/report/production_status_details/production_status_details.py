@@ -42,16 +42,18 @@ def get_data(filters):
 	result = frappe.db.sql("""
         SELECT 
             dp.production_date,
-            dp.color,
+            dpc.color,
             dp.process_type,
 			dp.floor,
 			dp.facility_or_line,
-            dp.total_quantity,
-            dp.completed_quantity,
-            dp.bill_quantity,
-			dp.total_quantity-dp.completed_quantity-dp.bill_quantity
+            dpc.color_quantity,
+            dpc.done_quantity,
+            dpc.ongoing_quantity,
+			dpc.color_quantity-dpc.done_quantity-dpc.ongoing_quantity
             
         FROM `tabDaily Production` dp
+        JOIN `tabDaily Production Colors` dpc 
+            ON dpc.parent = dp.name
         WHERE %s
 		ORDER BY FIELD(process_type, 'cutting', 'sewing', 'iron');
     """ % conditions, as_list=1)
@@ -62,7 +64,7 @@ def get_conditions(filters):
 	conditions="1=1" 
 	if filters.get("po_list"):conditions += " AND dp.po = '%s'" % filters["po_list"]
 	if filters.get("style_list"):conditions += " AND dp.style_list = '%s'" % filters["style_list"]
-	if filters.get("color"):conditions += " AND dp.color LIKE CONCAT('%%', {0}, '%%')".format(
+	if filters.get("color"):conditions += " AND dpc.color LIKE CONCAT('%%', {0}, '%%')".format(
 		frappe.db.escape(filters["color"])
 	)
 	if filters.get("process_type"):conditions += " AND dp.process_type = '%s'" % filters["process_type"]
