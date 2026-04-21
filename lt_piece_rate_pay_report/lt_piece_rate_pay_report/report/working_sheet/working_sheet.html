@@ -2,7 +2,7 @@
 	var report_columns = report.get_columns_for_print();
 	report_columns = report_columns.filter(col => !col.hidden);
 
-	if (report_columns.length > 180) {
+	if (report_columns.length > 280) {
 		frappe.throw(__("Too many columns. Export the report and print it using a spreadsheet application."));
 	}
 %}
@@ -138,7 +138,7 @@
                 <th></th>
                 <th></th>
                 {% for (let i = 0; i < buyer_groups[g].length; i += 8) { %}
-                    <th class="text-center" colspan="5">
+                    <th class="text-center" colspan="5" style="white-space: normal;">
                         {%= buyer_groups[g][i].label.split("$")[1] %}
                     </th>
                 {% } %}

@@ -81,7 +81,7 @@ def get_columns(filters):
         header = f"{buyer} $ {po} | {style} | {color_string}${total_qty}${com_qty}${bill_qty}"
 
         columns += [
-            {"label": f"{header} $ Name of Operation", "fieldname": f"{scrubbed}_operation", "fieldtype": "Small Text", "width": 140},
+            {"label": f"{header} $ Operation Name", "fieldname": f"{scrubbed}_operation", "fieldtype": "Small Text", "width": 140},
             {"label": f"{header} $ Bill Qty", "fieldname": f"{scrubbed}_bill", "fieldtype": "Small Text", "width": 90},
             {"label": f"{header} $ Bill Qty Dzn", "fieldname": f"{scrubbed}_bill_dzn", "fieldtype": "Small Text", "width": 90},
             {"label": f"{header} $ Rate Dzn", "fieldname": f"{scrubbed}_rate", "fieldtype": "Small Text", "width": 90},
