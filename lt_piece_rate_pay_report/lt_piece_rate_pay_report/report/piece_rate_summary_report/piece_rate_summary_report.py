@@ -16,11 +16,11 @@ def get_columns():
         {"label": "Employee Name", "fieldname": "employee_name", "fieldtype": "Data", "width": 180},
         # {"label": "Total Pieces", "fieldname": "total_pieces", "fieldtype": "Float", "width": 120},
         # {"label": "Total Dozen", "fieldname": "total_dozen", "fieldtype": "Float", "width": 120},
-        {"label": "Amount Payable", "fieldname": "amount_payable", "fieldtype": "Currency", "width": 150},
-        {"label": "Stamp Deduction", "fieldname": "stamp_ded", "fieldtype": "Currency", "width": 150},
-        {"label": "Net Amount", "fieldname": "net_amount", "fieldtype": "Currency", "width": 150},
-        {"label": "Advance", "fieldname": "advance", "fieldtype": "Currency", "width": 150},
-        {"label": "Payable After Deduct", "fieldname": "payable_after_deduct", "fieldtype": "Currency", "width": 150},
+        {"label": "Amount Payable", "fieldname": "amount_payable", "fieldtype": "Int", "width": 150},
+        {"label": "Stamp Deduction", "fieldname": "stamp_ded", "fieldtype": "Int", "width": 150},
+        {"label": "Net Amount", "fieldname": "net_amount", "fieldtype": "Int", "width": 150},
+        {"label": "Advance", "fieldname": "advance", "fieldtype": "Int", "width": 150},
+        {"label": "Payable After Deduct", "fieldname": "payable_after_deduct", "fieldtype": "Int", "width": 150},
         {"label": "SIGNATURE", "fieldname": "singature", "fieldtype": "Data", "width": 150},
 
     ]
@@ -63,6 +63,10 @@ def get_conditions(filters):
 
     if filters.get("contract_worker_payroll_entry"):
         conditions += " and cwss.contract_worker_payroll_entry= '%s'" % filters["contract_worker_payroll_entry"]
+
+    if filters.get("employee_type"): 
+        conditions += "and cwss.employee_type= '%s'" % filters["employee_type"]
+
 
     if filters.get("floor"):
         conditions += " AND ppi.floor = '%s'" % filters["floor"]

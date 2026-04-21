@@ -74,6 +74,15 @@ frappe.query_reports["Working Sheet"] = {
 	]
 	,
 	 onload: function(report) {
+           // ✅ Filter Contract Worker Payroll Entry (docstatus = 1)
+    report.get_filter('contract_worker_payroll_entry').get_query = function() {
+        return {
+            filters: {
+                docstatus: 1
+            }
+        };
+    };
+    
         report.page.fields_dict.contract_worker_payroll_entry.df.onchange = () => {
             let selected = report.get_filter_value("contract_worker_payroll_entry");
 

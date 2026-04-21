@@ -81,5 +81,14 @@ frappe.query_reports["Top Sheet Totals"] = {
 		},
 
 
-	]
+	],
+	onload: function(report) {
+    report.get_filter('contract_worker_payroll_entry').get_query = function() {
+        return {
+            filters: {
+                docstatus: 1
+            }
+        };
+    };
+}
 };

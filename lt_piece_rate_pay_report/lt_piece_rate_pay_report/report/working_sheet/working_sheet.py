@@ -4,8 +4,8 @@ def execute(filters=None):
     if not filters:
         filters = {}
 
-    columns, buyers = get_columns(filters)
-    data = get_data(buyers, filters)
+    columns, groups = get_columns(filters)
+    data = get_data(groups, filters)
     return columns, data
 
 
@@ -20,6 +20,7 @@ def get_columns(filters):
         SELECT 
             dp.buyer, dp.po, dp.style_list,
             dpc.color,
+            dp.total_quantity, dp.completed_quantity, dp.bill_quantity,
             SUM(dpc.ongoing_quantity) as ongoing_qty
         FROM `tabDaily Production` dp
         LEFT JOIN `tabDaily Production Colors` dpc 
@@ -32,25 +33,39 @@ def get_columns(filters):
         ORDER BY dp.buyer
     """, as_dict=True)
 
-    # 🔹 GROUP COLORS PER (buyer, po, style)
+    # ✅ FIXED GROUPING
     grouped = {}
 
     for r in rows:
         key = (r.buyer, r.po, r.style_list)
 
         if key not in grouped:
-            grouped[key] = []
+            grouped[key] = {
+                "colors": [],
+                "total_qty": r.total_quantity or 0,
+                "com_qty": r.completed_quantity or 0,
+                "bill_qty": r.bill_quantity or 0,
+            }
 
         if r.color:
-            grouped[key].append(
+            grouped[key]["colors"].append(
                 f"{r.color} = {int(r.ongoing_qty or 0)} PCS"
             )
 
-    # convert to list
+    # ✅ CONVERT TO LIST (WITH TOTALS)
     groups = []
-    for (buyer, po, style), colors in grouped.items():
-        color_string = " | ".join(colors)
-        groups.append((buyer, po, style, color_string))
+    for (buyer, po, style), val in grouped.items():
+        color_string = " | ".join(val["colors"])
+
+        groups.append((
+            buyer,
+            po,
+            style,
+            color_string,
+            val["total_qty"],
+            val["com_qty"],
+            val["bill_qty"]
+        ))
 
     # 🔹 STATIC COLUMNS
     columns = [
@@ -58,27 +73,28 @@ def get_columns(filters):
         {"label": "Employee Name", "fieldname": "employee_name", "fieldtype": "Data", "width": 150},
     ]
 
-    # 🔹 DYNAMIC COLUMNS (GROUPED)
-    for buyer, po, style, color_string in groups:
+    # 🔹 DYNAMIC COLUMNS
+    for buyer, po, style, color_string, total_qty, com_qty, bill_qty in groups:
 
-        key = f"{buyer}_{po}_{style}"
-        scrubbed = frappe.scrub(key)
+        scrubbed = frappe.scrub(f"{buyer}_{po}_{style}")
 
-        header = f"{buyer} | {po} | {style} | {color_string}"
+        header = f"{buyer} $ {po} | {style} | {color_string}${total_qty}${com_qty}${bill_qty}"
 
         columns += [
             {"label": f"{header} $ Name of Operation", "fieldname": f"{scrubbed}_operation", "fieldtype": "Small Text", "width": 140},
-            {"label": f"{header} $ Rate Dzn", "fieldname": f"{scrubbed}_rate", "fieldtype": "Small Text", "width": 90},
             {"label": f"{header} $ Bill Qty", "fieldname": f"{scrubbed}_bill", "fieldtype": "Small Text", "width": 90},
             {"label": f"{header} $ Bill Qty Dzn", "fieldname": f"{scrubbed}_bill_dzn", "fieldtype": "Small Text", "width": 90},
+            {"label": f"{header} $ Rate Dzn", "fieldname": f"{scrubbed}_rate", "fieldtype": "Small Text", "width": 90},
             {"label": f"{header} $ Total", "fieldname": f"{scrubbed}_total", "fieldtype": "Small Text", "width": 110},
 
-            {"label": f"{header} $ Bill Qty_num", "fieldname": f"{scrubbed}_bill_num", "fieldtype": "Float", "width": 90},
-            {"label": f"{header} $ Bill Qty Dzn_num", "fieldname": f"{scrubbed}_bill_dzn_num", "fieldtype": "Float", "width": 90},
-            {"label": f"{header} $ Total_num", "fieldname": f"{scrubbed}_total_num", "fieldtype": "Float", "width": 110},
+            {"label": f"{header} $ Bill Qty_num", "fieldname": f"{scrubbed}_bill_num", "fieldtype": "Currency", "width": 90},
+            {"label": f"{header} $ Bill Qty Dzn_num", "fieldname": f"{scrubbed}_bill_dzn_num", "fieldtype": "Currency", "width": 90},
+            {"label": f"{header} $ Total_num", "fieldname": f"{scrubbed}_total_num", "fieldtype": "Currency", "width": 110},
         ]
 
     return columns, groups
+
+
 # ------------------------------------
 # GET DATA
 # ------------------------------------
@@ -97,7 +113,6 @@ def get_data(groups, filters):
 
     employees = [(e[0].strip(), (e[1] or "").strip()) for e in employees if e and e[0]]
 
-    # 🔹 FETCH DATA (WITHOUT COLOR NOW)
     all_rows = frappe.db.sql(f"""
         SELECT 
             dpd.employee,
@@ -115,22 +130,17 @@ def get_data(groups, filters):
         WHERE {conditions}
     """, as_dict=True)
 
-    # 🔹 GROUP BY (NO COLOR)
+    # 🔹 GROUP DATA
     lookup = {}
     for r in all_rows:
-        key = (
-            r.employee,
-            r.buyer,
-            r.po,
-            r.style_list
-        )
+        key = (r.employee, r.buyer, r.po, r.style_list)
 
         lookup.setdefault(key, []).append({
             "process_name": r.process_name,
             "quantity": r.quantity or 0,
-            "quantitydzn": round(r.quantitydzn or 0, 1),
+            "quantitydzn": round(r.quantitydzn or 0, 2),
             "rate": r.rate or 0,
-            "amount": round(r.amount or 0, 1),
+            "amount": round(r.amount or 0, 2),
         })
 
     data = []
@@ -142,25 +152,37 @@ def get_data(groups, filters):
             "employee_name": emp_name
         }
 
-        for buyer, po, style, color_string in groups:
+        for buyer, po, style, color_string, *_ in groups:
 
             key = (emp, buyer, po, style)
             processes = lookup.get(key, [])
 
             scrubbed = frappe.scrub(f"{buyer}_{po}_{style}")
 
-            process_names = "\n".join([p["process_name"] for p in processes])
-            rate_lines = "\n".join([str(p["rate"]) for p in processes])
+            row[f"{scrubbed}_operation"] = "".join([
+                f'<div class="line-cell">{p["process_name"]}</div>'
+                for p in processes
+            ])            
+            
+            row[f"{scrubbed}_bill"] = "".join([
+                f'<div class="line-cell">{p["quantity"]}</div>'
+                for p in processes
+            ])
 
-            bill_qty = "\n".join([str(p["quantity"]) for p in processes])
-            bill_dzn = "\n".join([str(p["quantitydzn"]) for p in processes])
-            total = "\n".join([str(p["amount"]) for p in processes])
+            row[f"{scrubbed}_bill_dzn"] = "".join([
+                f'<div class="line-cell">{p["quantitydzn"]}</div>'
+                for p in processes
+            ])
 
-            row[f"{scrubbed}_operation"] = process_names
-            row[f"{scrubbed}_bill"] = bill_qty
-            row[f"{scrubbed}_bill_dzn"] = bill_dzn
-            row[f"{scrubbed}_rate"] = rate_lines
-            row[f"{scrubbed}_total"] = total
+            row[f"{scrubbed}_rate"] = "".join([
+                f'<div class="line-cell">{p["rate"]}</div>'
+                for p in processes
+            ])
+
+            row[f"{scrubbed}_total"] = "".join([
+                f'<div class="line-cell">{p["amount"]}</div>'
+                for p in processes
+            ])
 
             row[f"{scrubbed}_bill_num"] = sum(p["quantity"] for p in processes)
             row[f"{scrubbed}_bill_dzn_num"] = sum(p["quantitydzn"] for p in processes)
@@ -169,6 +191,8 @@ def get_data(groups, filters):
         data.append(row)
 
     return data
+
+
 # ------------------------------------
 # CONDITIONS
 # ------------------------------------
@@ -193,6 +217,6 @@ def get_conditions(filters):
         conditions += " AND dp.process_type = '%s'" % filters["process_type"]
 
     if filters.get("company"):
-        conditions += " AND dp.company= '%s'" % filters["company"]
+        conditions += " AND dp.company = '%s'" % filters["company"]
 
     return conditions, filters

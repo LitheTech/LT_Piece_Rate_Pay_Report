@@ -54,11 +54,35 @@ frappe.query_reports["Piece Rate Summary Report"] = {
 			"options": "Company",
 			"default": frappe.defaults.get_user_default("Company"),
 		},
+        {
+			"fieldname": "employee_type",
+			"fieldtype": "Select",
+			"label": "Employee Type",
+			"mandatory": 0,
+			// "default":"Active",
+			// "options": "Active,Left",
+			options: [
+                '',
+                'Salary',
+                'Contract',
+            ],
+			"wildcard_filter": 0
+		}
         
 
 	]
     ,
 	 onload: function(report) {
+
+        // ✅ Filter Contract Worker Payroll Entry (docstatus = 1)
+    report.get_filter('contract_worker_payroll_entry').get_query = function() {
+        return {
+            filters: {
+                docstatus: 1
+            }
+        };
+    };
+
         report.page.fields_dict.contract_worker_payroll_entry.df.onchange = () => {
             let selected = report.get_filter_value("contract_worker_payroll_entry");
 

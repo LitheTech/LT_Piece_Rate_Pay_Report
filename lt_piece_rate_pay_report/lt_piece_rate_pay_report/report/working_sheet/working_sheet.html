@@ -17,6 +17,15 @@
         font-size: 7px; 
     }
 
+    .line-cell {
+    border-bottom: 1px solid black;
+    padding: 2px 0;
+}
+
+.line-cell:last-child {
+    border-bottom: none;
+}
+
     .table {
         width: 97%;
         border-collapse: collapse;
@@ -209,8 +218,7 @@
                 {% } %}
 
                 <td class="text-center">
-                    {%= total_val %}
-                </td>
+    {%= frappe.format(total_val, {fieldtype: "Float", precision: 2}) %}                </td>
 
             </tr>
             {% } %}
@@ -232,11 +240,15 @@
                     
                     {% let pos = i % 8; %}  
                     
-                    {% if (pos > 2) { %} 
+                    {% if (pos > 3) { %} 
                     <td class="text-center"> 
                         {% const col = buyer_groups[g][i]; %} 
                         {%= frappe.format(row[col.fieldname], col, {}, row) %} 
                     </td> 
+                    {% } %}
+
+                    {% if (pos == 6) { %} 
+                        <td></td>
                     {% } %}
                     
                     {% if (pos == 7) { %} 
@@ -249,8 +261,7 @@
                 {% } %}
 
                 <td class="text-center">
-                    {%= total_val %}
-                </td>
+    {%= frappe.format(total_val, {fieldtype: "Float", precision: 2}) %}                </td>
             </tr>
             
             {% } %}

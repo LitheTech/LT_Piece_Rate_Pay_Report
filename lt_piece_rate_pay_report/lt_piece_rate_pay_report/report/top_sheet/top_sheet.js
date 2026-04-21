@@ -40,7 +40,8 @@ frappe.query_reports["Top Sheet"] = {
                 'Contract',
             ],
 			"wildcard_filter": 0
-		},{
+		},
+		{
 			"fieldname": "buyer",
 			"fieldtype": "Link",
 			"label": "Buyer",
@@ -82,5 +83,14 @@ frappe.query_reports["Top Sheet"] = {
 		},
 
 
-	]
+	],
+	onload: function(report) {
+    report.get_filter('contract_worker_payroll_entry').get_query = function() {
+        return {
+            filters: {
+                docstatus: 1
+            }
+        };
+    };
+}
 };
