@@ -16,11 +16,11 @@ def get_columns():
         {"label": "Employee Name", "fieldname": "employee_name", "fieldtype": "Data", "width": 180},
         # {"label": "Total Pieces", "fieldname": "total_pieces", "fieldtype": "Float", "width": 120},
         # {"label": "Total Dozen", "fieldname": "total_dozen", "fieldtype": "Float", "width": 120},
-        {"label": "Amount Payable", "fieldname": "amount_payable", "fieldtype": "Int", "width": 150},
-        {"label": "Stamp Deduction", "fieldname": "stamp_ded", "fieldtype": "Int", "width": 150},
-        {"label": "Net Amount", "fieldname": "net_amount", "fieldtype": "Int", "width": 150},
-        {"label": "Advance", "fieldname": "advance", "fieldtype": "Int", "width": 150},
-        {"label": "Payable After Deduct", "fieldname": "payable_after_deduct", "fieldtype": "Int", "width": 150},
+        {"label": "Amount Payable", "fieldname": "amount_payable", "fieldtype": "Integer", "width": 150},
+        {"label": "Stamp Deduction", "fieldname": "stamp_ded", "fieldtype": "Integer", "width": 150},
+        {"label": "Net Amount", "fieldname": "net_amount", "fieldtype": "Integer", "width": 150},
+        {"label": "Advance", "fieldname": "advance", "fieldtype": "Integer", "width": 150},
+        {"label": "Payable After Deduct", "fieldname": "payable_after_deduct", "fieldtype": "Integer", "width": 150},
         {"label": "SIGNATURE", "fieldname": "singature", "fieldtype": "Data", "width": 150},
 
     ]
@@ -37,23 +37,21 @@ def get_data(filters):
 
 
     slips = frappe.db.sql("""
-    SELECT 
-        cwss.employee, 
-        cwss.employee_name, 
-        
-        SUM(ppi.quantitydz*ppi.rate) AS amount_payable,
-        cwss.tax as stamp_ded,
-        SUM(ppi.quantitydz*ppi.rate)-cwss.tax AS net_amount,
-        cwss.advance as advance,
-        SUM(ppi.quantitydz*ppi.rate)-cwss.advance-cwss.tax As payable_after_deduct
-                                          
-    FROM
-            `tabContract Worker Salary Slip` cwss
-            JOIN `tabProduction Pay Items` ppi ON cwss.name = ppi.parent
-    WHERE %s and total_amount>0
-                          group by cwss.employee
-	"""%conditions, as_dict=True)
-
+        SELECT 
+            cwss.employee, 
+            cwss.employee_name, 
+            
+            ROUND(SUM(ppi.quantitydz * ppi.rate), 0) AS amount_payable,
+            ROUND(cwss.tax, 0) AS stamp_ded,
+            ROUND(SUM(ppi.quantitydz * ppi.rate) - cwss.tax, 0) AS net_amount,
+            ROUND(cwss.advance, 0) AS advance,
+            ROUND(SUM(ppi.quantitydz * ppi.rate) - cwss.advance - cwss.tax, 0) AS payable_after_deduct
+                                            
+        FROM `tabContract Worker Salary Slip` cwss
+        JOIN `tabProduction Pay Items` ppi ON cwss.name = ppi.parent
+        WHERE %s AND total_amount > 0
+        GROUP BY cwss.employee
+    """ % conditions, as_dict=True)
 
     return slips
 

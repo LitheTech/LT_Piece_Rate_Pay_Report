@@ -19,7 +19,8 @@
 
     .line-cell {
     border-bottom: 1px solid black;
-    padding: 2px 0;
+    margin-left: -5px;
+    margin-right: -5px;
 }
 
 .line-cell:last-child {
@@ -177,7 +178,7 @@
                     {% } %}
 
                 {% } %}
-                <th>Total Sum</th>
+                <th class="text-center">Total Sum</th>
 
             </tr>
            
@@ -190,7 +191,7 @@
 
                 <!-- print first 2 fixed columns -->
                 {% for (let i = 0; i < 2; i++) { %}
-                    <td class="text-center">
+                    <td class="text-center" style="vertical-align: middle;">
                         {%= frappe.format(row[report_columns[i].fieldname], report_columns[i], {}, row) %}
                     </td>
                 {% } %}
@@ -218,7 +219,8 @@
                 {% } %}
 
                 <td class="text-center">
-    {%= frappe.format(total_val, {fieldtype: "Float", precision: 2}) %}                </td>
+                    {%= frappe.format(total_val, {fieldtype: "Integer"}) %}     
+                </td>
 
             </tr>
             {% } %}
@@ -248,7 +250,9 @@
                     {% } %}
 
                     {% if (pos == 6) { %} 
-                        <td></td>
+                        {% let val = flt(row[buyer_groups[g][i+1].fieldname])/flt(row[buyer_groups[g][i-1].fieldname]); %}
+                        {% val = Math.round(val * 100) / 100; %}
+                        <td class="text-center">{%= frappe.format(val, {fieldtype: "Integer", precision: 2}) %} </td>
                     {% } %}
                     
                     {% if (pos == 7) { %} 
@@ -261,7 +265,8 @@
                 {% } %}
 
                 <td class="text-center">
-    {%= frappe.format(total_val, {fieldtype: "Float", precision: 2}) %}                </td>
+                    {%= frappe.format(total_val, {fieldtype: "Integer", precision: 2}) %}
+                </td>
             </tr>
             
             {% } %}

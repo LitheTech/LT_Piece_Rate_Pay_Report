@@ -10,11 +10,6 @@
 
 
 <style>
-	
-	.financial-statements-blank-row td {
-		height: 17px;
-	}
-
     tr, td{
         border: 1px solid black;
     }
@@ -52,28 +47,30 @@
 	</thead>
 	<tbody>
 		{% for(let j=0, k=data.length; j<k; j++) { %}
-			{%
-				var row = data[j];
-				var row_class = data[j].parent_account ? "" : "financial-statements-important";
-				row_class += data[j].account_name ? "" : " financial-statements-blank-row";
-			%}
-				{% if (j === data.length - 1) { %}
-					<tr class="{%= row_class %}">
-						<td></td>
-				{% } else { %}
-					<tr class="{%= row_class %}" style="height: 90px;">
+			{% const row = data[j]; %}
+		
+			{% if (j === data.length - 1) { %}
+				<tr>
+					<td>Total</td>
+			{% } else { %}
+				<tr style="height: 90px;">
 					<td class="text-center" >{%= j+1 %}</td>
-				{% } %}		
+			{% } %}		
 		
 				{% for(let i=0, l=report_columns.length; i<l-1; i++) { %}
-					<td class="text-center">
+				{% if (i === l - 2 || i ===l-3) { %}
+					<td style="text-align: center; font-weight:bold;">
+				{% } else { %}
+					<td style="text-align: center;">
+
+				{% } %}	
 						{% const fieldname = report_columns[i].fieldname; %}
 						{% if (!is_null(row[fieldname])) { %}
 							{%= frappe.format(row[fieldname], report_columns[i], {}, row) %}
 						{% } %}
 					</td>
 				{% } %}
-									<td></td>
+				<td></td>
 
 				
 			</tr>

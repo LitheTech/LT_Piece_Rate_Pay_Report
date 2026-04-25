@@ -2,14 +2,27 @@
 // For license information, please see license.txt
 /* eslint-disable */
 
-frappe.query_reports["Production Status Details"] = {
+frappe.query_reports["Production Status Periodical"] = {
 	filters: [
+		{
+            "fieldname": "start_date",
+            "label": __("Start Date"),
+            "fieldtype": "Date",
+			"default": frappe.datetime.get_today(),
+			"reqd": 1,
+        },
+        {
+            "fieldname": "end_date",
+            "label": __("End Date"),
+            "fieldtype": "Date",
+			"default": frappe.datetime.get_today(),
+			"reqd": 1,
+        },
 		{
 			fieldname: "po_list",
 			label: __("PO List"),
 			fieldtype: "Link",
 			options: "PO List",
-			reqd: 1,
 
 			on_change: function () {
 				// ✅ Reset dependent filters (value + options)
@@ -27,7 +40,6 @@ frappe.query_reports["Production Status Details"] = {
 			fieldname: "style_list",
 			label: __("Style"),
 			fieldtype: "Select",
-			reqd: 1,
 
 			on_change: function () {
 				// ✅ Reset color filter
@@ -94,7 +106,7 @@ function load_styles() {
 	if (!po) return;
 
 	frappe.call({
-		method: "lt_piece_rate_pay_report.lt_piece_rate_pay_report.report.production_status_details.production_status_details.get_styles",
+		method: "lt_piece_rate_pay_report.lt_piece_rate_pay_report.report.production_status_periodical.production_status_periodical.get_styles",
 		args: { po_list: po },
 
 		callback: function (r) {
@@ -123,7 +135,7 @@ function load_colors() {
 	if (!po || !style) return;
 
 	frappe.call({
-		method: "lt_piece_rate_pay_report.lt_piece_rate_pay_report.report.production_status_details.production_status_details.get_colors",
+		method: "lt_piece_rate_pay_report.lt_piece_rate_pay_report.report.production_status_periodical.production_status_periodical.get_colors",
 		args: {
 			po_list: po,
 			style: style

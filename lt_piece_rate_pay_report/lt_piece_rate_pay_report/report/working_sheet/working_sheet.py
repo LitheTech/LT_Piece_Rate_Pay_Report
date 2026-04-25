@@ -87,9 +87,9 @@ def get_columns(filters):
             {"label": f"{header} $ Rate Dzn", "fieldname": f"{scrubbed}_rate", "fieldtype": "Small Text", "width": 90},
             {"label": f"{header} $ Total", "fieldname": f"{scrubbed}_total", "fieldtype": "Small Text", "width": 110},
 
-            {"label": f"{header} $ Bill Qty_num", "fieldname": f"{scrubbed}_bill_num", "fieldtype": "Currency", "width": 90},
-            {"label": f"{header} $ Bill Qty Dzn_num", "fieldname": f"{scrubbed}_bill_dzn_num", "fieldtype": "Currency", "width": 90},
-            {"label": f"{header} $ Total_num", "fieldname": f"{scrubbed}_total_num", "fieldtype": "Currency", "width": 110},
+            {"label": f"{header} $ Bill Qty_num", "fieldname": f"{scrubbed}_bill_num", "fieldtype": "Integer", "width": 90},
+            {"label": f"{header} $ Bill Qty Dzn_num", "fieldname": f"{scrubbed}_bill_dzn_num", "fieldtype": "Integer", "width": 90},
+            {"label": f"{header} $ Total_num", "fieldname": f"{scrubbed}_total_num", "fieldtype": "Integer", "width": 110},
         ]
 
     return columns, groups
@@ -103,12 +103,16 @@ def get_data(groups, filters):
     conditions, filters = get_conditions(filters)
 
     employees = frappe.db.sql(f"""
-        SELECT DISTINCT dpd.employee, dpd.employee_name
-        FROM `tabDaily Production Details` dpd
-        JOIN `tabDaily Production` dp ON dpd.parent = dp.name
-        WHERE {conditions}
-        AND dpd.employee IS NOT NULL
-        ORDER BY dpd.employee
+    SELECT DISTINCT 
+        dpd.employee, 
+        dpd.employee_name,
+        emp.employment_type
+    FROM `tabDaily Production Details` dpd
+    JOIN `tabDaily Production` dp ON dpd.parent = dp.name
+    LEFT JOIN `tabEmployee` emp ON emp.name = dpd.employee
+    WHERE {conditions}
+    AND dpd.employee IS NOT NULL
+    ORDER BY emp.employment_type, dpd.employee
     """, as_list=True)
 
     employees = [(e[0].strip(), (e[1] or "").strip()) for e in employees if e and e[0]]
@@ -121,10 +125,10 @@ def get_data(groups, filters):
             dp.buyer,
             dp.po,
             dp.style_list,
-            dpd.quantity,
+    CAST(dpd.quantity AS SIGNED) AS quantity,
             dpd.quantity / 12 AS quantitydzn,
             dpd.rate,
-            dpd.amount
+    CAST(ROUND(dpd.amount) AS SIGNED) AS amount
         FROM `tabDaily Production` dp
         JOIN `tabDaily Production Details` dpd ON dp.name = dpd.parent
         WHERE {conditions}
@@ -138,9 +142,9 @@ def get_data(groups, filters):
         lookup.setdefault(key, []).append({
             "process_name": r.process_name,
             "quantity": r.quantity or 0,
-            "quantitydzn": round(r.quantitydzn or 0, 2),
+            "quantitydzn": round(r.quantitydzn or 0, 0),
             "rate": r.rate or 0,
-            "amount": round(r.amount or 0, 2),
+            "amount": round(r.amount or 0, 0),
         })
 
     data = []
