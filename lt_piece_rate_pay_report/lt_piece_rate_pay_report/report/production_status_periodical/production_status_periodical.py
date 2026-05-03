@@ -43,7 +43,7 @@ def get_data(filters):
         SELECT 
             dp.production_date,
             dp.po,
-            dp.style_list,
+            dpc.style,
             dpc.color,
             dp.process_type,
 			dp.floor,
@@ -69,7 +69,7 @@ def get_conditions(filters):
             filters["start_date"], filters["end_date"]
         )
 	if filters.get("po_list"):conditions += " AND dp.po = '%s'" % filters["po_list"]
-	if filters.get("style_list"):conditions += " AND dp.style_list = '%s'" % filters["style_list"]
+	if filters.get("style_list"):conditions += " AND dpc.style = '%s'" % filters["style_list"]
 	if filters.get("color"):conditions += " AND dpc.color LIKE CONCAT('%%', {0}, '%%')".format(
 		frappe.db.escape(filters["color"])
 	)

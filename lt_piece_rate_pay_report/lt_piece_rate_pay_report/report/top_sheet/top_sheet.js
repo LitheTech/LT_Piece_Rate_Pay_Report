@@ -11,6 +11,18 @@ frappe.query_reports["Top Sheet"] = {
             "options": "Contract Worker Payroll Entry",
             "reqd": 1
         },
+		{
+            "fieldname": "start_date",
+            "label": __("Start Date"),
+            "fieldtype": "Date",
+            "read_only": 1
+        },
+        {
+            "fieldname": "end_date",
+            "label": __("End Date"),
+            "fieldtype": "Date",
+            "read_only": 1
+        },
         // {
         //     "fieldname": "company",
         //     "label": __("Company"),
@@ -27,20 +39,7 @@ frappe.query_reports["Top Sheet"] = {
         //     "label": __("To Date"),
         //     "fieldtype": "Date"
         // }
-        {
-			"fieldname": "employee_type",
-			"fieldtype": "Select",
-			"label": "Employee Type",
-			"mandatory": 0,
-			// "default":"Active",
-			// "options": "Active,Left",
-			options: [
-                '',
-                'Salary',
-                'Contract',
-            ],
-			"wildcard_filter": 0
-		},
+
 		{
 			"fieldname": "buyer",
 			"fieldtype": "Link",
@@ -81,10 +80,17 @@ frappe.query_reports["Top Sheet"] = {
 			"default": frappe.defaults.get_user_default("Company"),
 			"reqd": 1
 		},
+		{
+			"fieldname": "show_total",
+			"fieldtype": "Check",
+			"label": "Show Total",
+		},
 
 
-	],
-	onload: function(report) {
+	]
+	,
+	 onload: function(report) {
+           // ✅ Filter Contract Worker Payroll Entry (docstatus = 1)
     report.get_filter('contract_worker_payroll_entry').get_query = function() {
         return {
             filters: {
@@ -92,5 +98,17 @@ frappe.query_reports["Top Sheet"] = {
             }
         };
     };
-}
+    
+        report.page.fields_dict.contract_worker_payroll_entry.df.onchange = () => {
+            let selected = report.get_filter_value("contract_worker_payroll_entry");
+
+            if (!selected) return;
+
+            frappe.db.get_doc("Contract Worker Payroll Entry", selected).then(doc => {
+                report.set_filter_value("start_date", doc.start_date);
+                report.set_filter_value("end_date", doc.end_date);
+            });
+        };
+    }
+
 };

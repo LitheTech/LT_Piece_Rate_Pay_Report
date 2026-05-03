@@ -56,7 +56,7 @@ def get_conditions(filters):
 	conditions="1=1" 
 	if filters.get("sales_contract"):conditions += " AND dp.sales_contract = '%s'" % filters["sales_contract"]
 	if filters.get("po_list"):conditions += " AND dp.po = '%s'" % filters["po_list"]
-	if filters.get("style_list"):conditions += " AND dp.style_list = '%s'" % filters["style_list"]
+	# if filters.get("style_list"):conditions += " AND dp.style_list = '%s'" % filters["style_list"]
 	if filters.get("color"):conditions += " AND dpc.color LIKE CONCAT('%%', {0}, '%%')".format(
         	frappe.db.escape(filters["color"])
     	)
