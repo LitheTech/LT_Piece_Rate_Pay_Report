@@ -48,6 +48,8 @@
 	<tbody>
 		{% for(let j=0, k=data.length; j<k; j++) { %}
 			{% const row = data[j]; %}
+
+			{% if (j === data.length - 2) { continue; } %}
 		
 			{% if (j === data.length - 1) { %}
 				<tr>
@@ -78,4 +80,6 @@
 		{% } %}
 	</tbody>
 </table>
-
+<p style="font-size: +1;"><b>
+    {%= frappe.format(data[data.length - 2]["employee_name"], report_columns[1], {}, data[data.length - 2]) %}
+</b></p>

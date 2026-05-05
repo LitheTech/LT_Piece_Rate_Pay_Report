@@ -60,7 +60,7 @@ frappe.query_reports["Working Sheet"] = {
 			"label": __("Company"),
 			"fieldtype": "Link",
 			"options": "Company",
-			"default": frappe.defaults.get_user_default("Company"),
+			// "default": frappe.defaults.get_user_default("Company"),
 		},
 		// {
 		// 	"fieldname": "process",

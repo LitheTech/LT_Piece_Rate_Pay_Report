@@ -1,4 +1,5 @@
 import frappe
+from frappe.utils import flt, money_in_words
 
 def execute(filters=None):
     if not filters:
@@ -7,14 +8,23 @@ def execute(filters=None):
     columns = get_columns()
     data = get_data(filters)
 
+    total_payable = sum(flt(row.get("payable_after_deduct", 0)) for row in data)
+    
+    if data:
+        # Add a special row for the words at the end of the data list
+        data.append({
+            "employee": "TOTAL_IN_WORDS", # We use this as a flag in HTML
+            "employee_name": money_in_words(total_payable, "Taka = ")
+        })
+
     return columns, data
 
 
 def get_columns():
     return [
-        {"label": "Employee", "fieldname": "employee", "fieldtype": "Data", "width": 120},
+        {"label": "Employee ID", "fieldname": "employee", "fieldtype": "Data", "width": 120},
         {"label": "Employee Name", "fieldname": "employee_name", "fieldtype": "Data", "width": 180},
-        # {"label": "Total Pieces", "fieldname": "total_pieces", "fieldtype": "Float", "width": 120},
+        {"label": "Total Qty", "fieldname": "total_pieces", "fieldtype": "Integer", "width": 120},
         # {"label": "Total Dozen", "fieldname": "total_dozen", "fieldtype": "Float", "width": 120},
         {"label": "Amount Payable", "fieldname": "amount_payable", "fieldtype": "Integer", "width": 150},
         {"label": "Stamp Deduction", "fieldname": "stamp_ded", "fieldtype": "Integer", "width": 150},
@@ -40,7 +50,7 @@ def get_data(filters):
         SELECT 
             cwss.employee, 
             cwss.employee_name, 
-            
+            cwss.total_pieces,
             ROUND(SUM(ppi.quantitydz * ppi.rate), 0) AS amount_payable,
             ROUND(cwss.tax, 0) AS stamp_ded,
             ROUND(SUM(ppi.quantitydz * ppi.rate) - cwss.tax, 0) AS net_amount,

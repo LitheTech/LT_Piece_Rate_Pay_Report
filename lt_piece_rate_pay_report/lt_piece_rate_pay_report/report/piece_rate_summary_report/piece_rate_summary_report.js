@@ -52,7 +52,7 @@ frappe.query_reports["Piece Rate Summary Report"] = {
 			"label": __("Company"),
 			"fieldtype": "Link",
 			"options": "Company",
-			"default": frappe.defaults.get_user_default("Company"),
+			// "default": frappe.defaults.get_user_default("Company"),
 		},
         {
 			"fieldname": "employee_type",

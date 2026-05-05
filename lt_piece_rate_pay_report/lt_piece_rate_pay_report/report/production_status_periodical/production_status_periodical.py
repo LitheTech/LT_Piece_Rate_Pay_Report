@@ -18,6 +18,7 @@ def execute(filters=None):
 def get_columns():
 	return [
         _("Production Date") + ":Data:130",
+        _("Buyer") + ":Data:200",
         _("PO") + ":Data:200",
         _("Style") + ":Data:90",
         _("Color") + ":Data:150",
@@ -42,6 +43,7 @@ def get_data(filters):
 	result = frappe.db.sql("""
         SELECT 
             dp.production_date,
+            dp.buyer,
             dp.po,
             dpc.style,
             dpc.color,
@@ -63,7 +65,7 @@ def get_data(filters):
 	return result
 
 def get_conditions(filters):
-	conditions="1=1" 
+	conditions="is_revised != 1" 
 	if filters.get("start_date") and filters.get("end_date"):
 		conditions += " AND dp.production_date BETWEEN '%s' AND '%s'" % (
             filters["start_date"], filters["end_date"]
