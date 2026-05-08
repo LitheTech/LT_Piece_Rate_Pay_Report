@@ -63,11 +63,16 @@ def get_data(filters):
                 dp.process_type,
                 NULL, NULL, NULL,NULL,NULL,
 
-				SUM(dp.bill_quantity) AS bill_qty_pcs,
-				ROUND(SUM(dp.bill_quantity) / 12, 1) AS bill_qty_dzn,
+				SUM(CASE WHEN dp.is_revised = 1 THEN 0 ELSE dp.bill_quantity END) AS bill_qty_pcs,
 
+				-- Total Quantity in Dozen
+				ROUND(SUM(CASE WHEN dp.is_revised = 1 THEN 0 ELSE dp.bill_quantity END) / 12, 1) AS bill_qty_dzn,
+
+				-- Rate calculation (Handling NULLIF to prevent division by zero)
 				ROUND(
-					(SUM(dp.total_amount) / NULLIF(SUM(dp.bill_quantity), 0)) * 12,
+					(SUM(dp.total_amount) / 
+					NULLIF(SUM(CASE WHEN dp.is_revised = 1 THEN 0 ELSE dp.bill_quantity END), 0)
+					) * 12,
 					1
 				) AS pcs_rate,
 
@@ -116,9 +121,12 @@ def get_data(filters):
 
 				dpc.style,
 
-				dp.bill_quantity,
-				ROUND((dp.bill_quantity / 12), 1) AS bill_qty_dzn,
-				ROUND((dp.total_amount * 12) / dp.bill_quantity, 1) AS pcs_rate,
+				CASE WHEN dp.is_revised = 1 THEN 0 ELSE dp.bill_quantity END AS bill_quantity,
+        		ROUND((CASE WHEN dp.is_revised = 1 THEN 0 ELSE dp.bill_quantity END / 12), 1) AS bill_qty_dzn,
+				CASE 
+					WHEN dp.is_revised = 1 OR dp.bill_quantity = 0 THEN 0 
+					ELSE ROUND((dp.total_amount * 12) / dp.bill_quantity, 1) 
+				END AS pcs_rate,
 
 				SUM(CASE 
 						WHEN dpd.employee_type = 'contract' 

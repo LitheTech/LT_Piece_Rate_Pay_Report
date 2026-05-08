@@ -36,7 +36,7 @@
     .table td, .table th {
         padding: 1px;
         border: 1px solid black;
-        white-space: nowrap; 
+        /* white-space: nowrap;  */
         text-align: center;
     }
 
@@ -92,7 +92,7 @@
     <table class="table table-bordered">
         <thead>
             {% if (g === 0) { %}
-                <tr><th class="text-center" colspan="18"><font size="+1">{%= __(report.report_name) %}</font></th></tr>
+                <tr><th class="text-center" colspan="19"><font size="+1">{%= __(report.report_name) %}</font></th></tr>
 
                 <tr>
                     {% if (!is_null(filters.start_date)) { %}
@@ -129,10 +129,21 @@
                 <th></th>
                 {% for (let i = 0; i < buyer_groups[g].length; i += 8) { %}
                     <th class="text-center" colspan="5">
-                        Buyer: {%= buyer_groups[g][i].label.split("$")[0] %}
+                        Buyer: {%= (buyer_groups[g][i].label.split("$")[0]).split("^")[0] %}
                     </th>
                 {% } %}
+                <th colspan="2"></th>
+            </tr>
+
+             <tr>
                 <th></th>
+                <th></th>
+                {% for (let i = 0; i < buyer_groups[g].length; i += 8) { %}
+                    <th class="text-center" colspan="5">
+                        S/C : {%= (buyer_groups[g][i].label.split("$")[0]).split("^")[1] %}
+                    </th>
+                {% } %}
+                <th colspan="2"></th>
             </tr>
 
             <tr>
@@ -143,24 +154,24 @@
                         {%= buyer_groups[g][i].label.split("$")[1] %}
                     </th>
                 {% } %}
-                <th></th>
+                <th colspan="2"></th>
             </tr>
 
             <tr>
                 <th></th>
                 <th></th>
                 {% for (let i = 0; i < buyer_groups[g].length; i += 8) { %}
-                    <th class="text-center" colspan="2">
+                    <th class="text-center">
                         Total: {%= buyer_groups[g][i].label.split("$")[2] %}
                     </th>
                     <th class="text-center" colspan="2">
                         Complete: {%= buyer_groups[g][i].label.split("$")[3] || 0 %}
                     </th>
-                    <th>
+                    <th class="text-center" colspan="2">
                         Bill: {%= buyer_groups[g][i].label.split("$")[4] %}
                     </th>
                 {% } %}
-                <th></th>
+                <th colspan="2"></th>
             </tr>
 
             <tr>
@@ -179,6 +190,7 @@
 
                 {% } %}
                 <th class="text-center">Total Sum</th>
+                <th class="text-center">Total Qty</th>
 
             </tr>
            
@@ -197,6 +209,7 @@
                 {% } %}
 
                 {% let total_val = 0; %}
+                {% let total_qty = 0; %}
 
                 <!-- print grouped buyer columns but hide last 3 of each 8 -->
                 {% for (let i = 0; i < buyer_groups[g].length; i++) { %}
@@ -216,10 +229,19 @@
                         {% total_val += val; %}
                     {% } %}
 
+                    {% if (pos == 5) { %} 
+                        {% const col1 = buyer_groups[g][i]; %}
+                        {% let qty = flt(row[col1.fieldname]); %}
+                        {% total_qty += qty; %}
+                    {% } %}
+
                 {% } %}
 
                 <td class="text-center">
                     {%= frappe.format(total_val, {fieldtype: "Integer"}) %}     
+                </td>
+                <td class="text-center">
+                    {%= frappe.format(total_qty, {fieldtype: "Integer"}) %}     
                 </td>
 
             </tr>
@@ -236,6 +258,8 @@
                 {% } %}
                                     
                 {% let total_val = 0; %}
+                {% let total_qty = 0; %}
+
 
             
                 {% for (let i = 3; i < buyer_groups[g].length; i++) { %} 
@@ -255,6 +279,12 @@
                         <td class="text-center">{%= frappe.format(val, {fieldtype: "Integer", precision: 2}) %} </td>
                     {% } %}
                     
+                    {% if (pos == 5) { %} 
+                        {% const col = buyer_groups[g][i]; %}
+                        {% let qty = flt(row[col.fieldname]); %}
+                        {% total_qty += qty; %}
+                    {% } %}
+
                     {% if (pos == 7) { %} 
                         {% const col = buyer_groups[g][i]; %}
                         {% let val = flt(row[col.fieldname]); %}
@@ -266,6 +296,9 @@
 
                 <td class="text-center">
                     {%= frappe.format(total_val, {fieldtype: "Integer", precision: 2}) %}
+                </td>
+                <td class="text-center">
+                    {%= frappe.format(total_qty, {fieldtype: "Integer"}) %}     
                 </td>
             </tr>
             
