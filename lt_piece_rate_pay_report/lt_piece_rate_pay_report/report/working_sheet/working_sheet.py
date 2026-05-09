@@ -36,7 +36,7 @@ def get_columns(filters):
         WHERE dp.buyer IS NOT NULL
           AND dp.po IS NOT NULL
             AND dp.sales_contract IS NOT NULL
-          AND {conditions} and dp.is_revised != 1
+          AND {conditions}
         GROUP BY dp.name, dpc.style, dpc.color
         ORDER BY dp.buyer
     """, as_dict=True)
@@ -144,7 +144,7 @@ def get_data(groups, filters):
         FROM `tabDaily Production` dp
         JOIN `tabDaily Production Details` dpd
             ON dp.name = dpd.parent
-        WHERE {conditions} and dp.is_revised != 1
+        WHERE {conditions}
     """, as_dict=True)
 
     lookup = {}

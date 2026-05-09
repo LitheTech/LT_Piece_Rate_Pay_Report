@@ -25,14 +25,10 @@ def get_columns():
         _("Style") + ":Data:90",
         _("Color") + ":Data:90",
 
-        # ("Quantity") + ":Int:100",
+        ("Quantity") + ":Int:100",
 		_("Bill Amount") + ":Int:100",
 
     ]
-
-# def get_data(filters):
-
-# 	conditions, filters = get_conditions(filters)
 
 def get_data(filters):
     if not filters.get("sales_contract"):
@@ -114,7 +110,7 @@ def get_data(filters):
                 "po": item.po,
                 "style": item.style,
                 "color": item.color,
-                # "quantity": prod_values["quantity"],
+                "quantity": prod_values["quantity"],
                 "bill_amount": flt(prod_values["bill_amount"], 2) # Ensure 2 decimal places
             })
 
