@@ -40,15 +40,18 @@ frappe.query_reports["Balance Status Report"] = {
 			fieldtype: "Link",
 			options: "PO List",
 			get_query: function () {
-				var sales_contract = frappe.query_report.get_filter_value("sales_contract");
-				if (sales_contract) {
-					return {
-						filters: {
-							sales_contract: sales_contract
-						}
-					};
-				}
+				let company = frappe.query_report.get_filter_value("company");
+				let buyer = frappe.query_report.get_filter_value("buyer");
+				let sales_contract = frappe.query_report.get_filter_value("sales_contract");
+				
+				let filters = {};
+				if (company) filters.company = company;
+				if (buyer) filters.buyer = buyer;
+				if (sales_contract) filters.sales_contract = sales_contract;
+				
+				return { filters: filters };
 			},
+		
 			// reqd: 1,
 
 			on_change: function () {
@@ -91,7 +94,7 @@ function load_styles() {
 	if (!po) return;
 
 	frappe.call({
-		method: "lt_piece_rate_pay_report.lt_piece_rate_pay_report.report.production_status_details.production_status_details.get_styles",
+		method: "lt_piece_rate_pay_report.lt_piece_rate_pay_report.report.balance_status_report.balance_status_report.get_styles",
 		args: { po_list: po },
 		callback: function (r) {
 			frappe.query_report.get_filter("style").df.options =
@@ -107,7 +110,7 @@ function load_colors() {
 	if (!po || !style) return;
 
 	frappe.call({
-		method: "lt_piece_rate_pay_report.lt_piece_rate_pay_report.report.production_status_details.production_status_details.get_colors",
+		method: "lt_piece_rate_pay_report.lt_piece_rate_pay_report.report.balance_status_report.balance_status_report.get_colors",
 		args: {
 			po_list: po,
 			style: style
