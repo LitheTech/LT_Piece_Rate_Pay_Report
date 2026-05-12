@@ -13,6 +13,16 @@ def execute(filters=None):
     columns = get_columns()
     data = get_data(filters)
 
+    status = filters.get("remain_qty_status")
+    
+    if status == "Greater than Zero":
+        # Equivalent to > 0
+        data = [row for row in data if row["remain_qty"] > 0]
+        
+    elif status == "Zero or Less":
+        # Equivalent to <= 0
+        data = [row for row in data if row["remain_qty"] <= 0]
+
     return columns, data
 
 
@@ -188,6 +198,10 @@ def get_conditions(filters):
     if filters.get("color"):
         conditions += " AND dpc.color = %(color)s"
         params["color"] = filters.get("color")
+
+    if filters.get("from_date") and filters.get("to_date"):
+        po_query+= " AND p.posting_date BETWEEN '%s' AND '%s'" % (
+            filters["from_date"], filters["to_date"])
     
     return conditions, params, po_query
 

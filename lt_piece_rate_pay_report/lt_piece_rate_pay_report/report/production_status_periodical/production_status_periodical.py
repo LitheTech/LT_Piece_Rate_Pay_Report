@@ -19,6 +19,7 @@ def get_columns():
 	return [
         _("Production Date") + ":Data:130",
         _("Buyer") + ":Data:200",
+        _("Sales Contract") + ":Data:200",
         _("PO") + ":Data:200",
         _("Style") + ":Data:90",
         _("Color") + ":Data:150",
@@ -44,6 +45,7 @@ def get_data(filters):
         SELECT 
             dp.production_date,
             dp.buyer,
+            dp.sales_contract,
             dp.po,
             dpc.style,
             dpc.color,

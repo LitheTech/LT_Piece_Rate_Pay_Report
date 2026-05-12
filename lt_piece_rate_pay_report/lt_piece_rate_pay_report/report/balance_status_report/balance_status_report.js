@@ -76,7 +76,7 @@ frappe.query_reports["Balance Status Report"] = {
 			label: __("Color"),
 			fieldtype: "Select"
 		},
-		 {
+		{
 			"fieldname": "process_type",
 			"fieldtype": "Link",
 			"label": "Process Type",
@@ -84,6 +84,23 @@ frappe.query_reports["Balance Status Report"] = {
 			"options": "Process Type",
 			"wildcard_filter": 0
 		},
+		{
+			"fieldname": "remain_qty_status",
+			"label": __("Remain Qty Status"),
+			"fieldtype": "Select",
+			"options": "\nGreater than Zero\nZero or Less",
+			"default": ""
+		},
+		{
+            "fieldname": "from_date",
+            "label": __("From Date"),
+            "fieldtype": "Date",
+        },
+        {
+            "fieldname": "to_date",
+            "label": __("To Date"),
+            "fieldtype": "Date",
+        },
 	]
 };
 
