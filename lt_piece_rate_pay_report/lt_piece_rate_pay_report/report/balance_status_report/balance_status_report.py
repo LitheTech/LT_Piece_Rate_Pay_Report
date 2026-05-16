@@ -32,6 +32,7 @@ def get_columns():
         _("Buyer") + ":Data:150",
         _("Master S/C") + ":Data:150",
         _("PO") + ":Data:150",
+        _("File/Lot") + ":Data:150",
         _("Style") + ":Data:100",
         _("Color") + ":Data:100",
         _("Process Type") + ":Data:120",
@@ -56,6 +57,7 @@ def get_data(filters):
             p.posting_date AS po_date,
             p.buyer,
             p.sales_contract AS master_sc,
+            p.filelot,
             c.style,
             c.color,
             c.quantity AS total_qty
@@ -158,6 +160,7 @@ def get_data(filters):
                 "po": item.po,
                 "style": item.style,
                 "color": item.color,
+                "file/lot":item.filelot,
                 "process_type": process,
                 "total_qty": total_q,
                 "completed_qty": comp_q,
