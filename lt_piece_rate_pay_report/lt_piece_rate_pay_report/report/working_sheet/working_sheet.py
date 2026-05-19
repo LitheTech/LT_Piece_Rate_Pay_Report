@@ -106,7 +106,7 @@ def get_columns(filters):
             {"label": f" $ Total", "fieldname": f"{scrubbed}_total", "fieldtype": "Small Text", "width": 110},
 
             {"label": f"$ Bill Qty_num", "fieldname": f"{scrubbed}_bill_num", "fieldtype": "Integer", "width": 90},
-            {"label": f"$ Bill Qty Dzn_num", "fieldname": f"{scrubbed}_bill_dzn_num", "fieldtype": "Integer", "width": 90},
+            {"label": f"$ Bill Qty Dzn_num", "fieldname": f"{scrubbed}_bill_dzn_num", "fieldtype": "Float", "width": 90},
             {"label": f" $ Total_num", "fieldname": f"{scrubbed}_total_num", "fieldtype": "Integer", "width": 110},
         ]
 
@@ -190,13 +190,13 @@ def get_data(groups, filters):
                 p_name = str(p["process_name"] or "")
                 
                 # Check if process name is long (more than 5 characters)
-                if len(p_name) > 16:
+                if len(p_name) > 17:
                     # 1. Remove the line-cell class for the long name so it wraps naturally
                     # or use a custom class that allows wrapping without a bottom border
                     # Line 1: First 15 characters
-                    line_1 = p_name[:16]
+                    line_1 = p_name[:17]
                     # Line 2: Everything after the 15th character
-                    line_2 = p_name[16:]
+                    line_2 = p_name[17:]
                     
                     # Combine them with a line break tag
                     formatted_name = f"{line_1}<br>{line_2}"
