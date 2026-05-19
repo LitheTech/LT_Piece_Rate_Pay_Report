@@ -51,11 +51,11 @@ def get_data(filters):
             cwss.employee, 
             cwss.employee_name, 
             cwss.total_pieces,
-            ROUND(SUM(ppi.quantitydz * ppi.rate), 0) AS amount_payable,
+            cwss.total_amount AS amount_payable,
             ROUND(cwss.tax, 0) AS stamp_ded,
-            ROUND(SUM(ppi.quantitydz * ppi.rate) - cwss.tax, 0) AS net_amount,
+            ROUND(cwss.total_amount - cwss.tax, 0) AS net_amount,
             ROUND(cwss.advance, 0) AS advance,
-            ROUND(SUM(ppi.quantitydz * ppi.rate) - cwss.advance - cwss.tax, 0) AS payable_after_deduct
+            ROUND(cwss.total_amount - cwss.advance - cwss.tax, 0) AS payable_after_deduct
                                             
         FROM `tabContract Worker Salary Slip` cwss
         JOIN `tabProduction Pay Items` ppi ON cwss.name = ppi.parent

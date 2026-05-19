@@ -138,7 +138,7 @@ def get_data(groups, filters):
             dpd.process_name,
             dp.name as dp_name,
             CAST(dpd.quantity AS SIGNED) AS quantity,
-            dpd.quantity / 12 AS quantitydzn,
+            ROUND(dpd.quantity / 12, 1) AS quantitydzn,
             dpd.rate,
             CAST(ROUND(dpd.amount) AS SIGNED) AS amount
         FROM `tabDaily Production` dp
@@ -186,11 +186,19 @@ def get_data(groups, filters):
                 p_name = str(p["process_name"] or "")
                 
                 # Check if process name is long (more than 5 characters)
-                if len(p_name) > 15:
+                if len(p_name) > 16:
                     # 1. Remove the line-cell class for the long name so it wraps naturally
                     # or use a custom class that allows wrapping without a bottom border
-                    op_html.append(f'<div class="line-cell">{p_name}</div>')
+                    # Line 1: First 15 characters
+                    line_1 = p_name[:16]
+                    # Line 2: Everything after the 15th character
+                    line_2 = p_name[16:]
                     
+                    # Combine them with a line break tag
+                    formatted_name = f"{line_1}<br>{line_2}"
+                    
+                    # We add 'white-space: normal' to ensure the browser respects the layout
+                    op_html.append(f'<div class="line-cell" style="white-space: normal; word-break: break-all;">{formatted_name}</div>')                    
                     # 2. Add the quantity and a filler &nbsp; to match the height of the wrapped text
                     bill_html.append(f'<div>{p["quantity"]}</div>')
                     bill_html.append('<div class="line-cell">&nbsp;</div>')
