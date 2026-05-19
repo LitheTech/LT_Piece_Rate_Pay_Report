@@ -19,8 +19,8 @@
 
     .line-cell {
     border-bottom: 1px solid black;
-    margin-left: -5px;
-    margin-right: -5px;
+    margin-left: -6px;
+    margin-right: -6px;
 }
 
 .line-cell:last-child {
@@ -115,6 +115,9 @@
                 <tr>
                     {% if (!is_null(filters.process_type)) { %}
                         <th class="text-center" colspan="3"><font size="+.5">Process Type: {%= filters.process_type %}</font></th>
+                    {% } %}
+                    {% if (!is_null(filters.employee_type)) { %}
+                        <th class="text-center" colspan="3"><font size="+.5">Employee Type: {%= filters.employee_type %}</font></th>
                     {% } %}
 
                     <!-- {% if (!is_null(filters.process)) { %}

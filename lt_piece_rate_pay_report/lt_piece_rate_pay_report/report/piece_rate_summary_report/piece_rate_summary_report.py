@@ -50,12 +50,12 @@ def get_data(filters):
         SELECT 
             cwss.employee, 
             cwss.employee_name, 
-            cwss.total_pieces,
-            cwss.total_amount AS amount_payable,
-            ROUND(cwss.tax, 0) AS stamp_ded,
-            ROUND(cwss.total_amount - cwss.tax, 0) AS net_amount,
+            SUM(ppi.quantity),
+            SUM(ppi.amount) AS amount_payable,
+            CASE WHEN SUM(ppi.amount) >= 1000 THEN 10 ELSE 0 END AS stamp_ded,
+            ROUND(SUM(ppi.amount) - (CASE WHEN SUM(ppi.amount) >= 1000 THEN 10 ELSE 0 END), 0) AS net_amount,
             ROUND(cwss.advance, 0) AS advance,
-            ROUND(cwss.total_amount - cwss.advance - cwss.tax, 0) AS payable_after_deduct
+            ROUND(SUM(ppi.amount) - cwss.advance - (CASE WHEN SUM(ppi.amount) >= 1000 THEN 10 ELSE 0 END), 0) AS payable_after_deduct
                                             
         FROM `tabContract Worker Salary Slip` cwss
         JOIN `tabProduction Pay Items` ppi ON cwss.name = ppi.parent

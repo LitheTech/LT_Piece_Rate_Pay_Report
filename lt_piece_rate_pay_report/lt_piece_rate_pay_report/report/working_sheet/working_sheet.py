@@ -120,13 +120,17 @@ def get_data(groups, filters):
 
     conditions, filters = get_conditions(filters)
 
+    emp_type_condition = ""
+    if filters.get("employee_type"):
+        emp_type_condition = " AND dpd.employee_type = '%s'" % filters["employee_type"]
+
     employees = frappe.db.sql(f"""
         SELECT DISTINCT 
             dpd.employee,
             dpd.employee_name
         FROM `tabDaily Production Details` dpd
         JOIN `tabDaily Production` dp ON dpd.parent = dp.name
-        WHERE {conditions}
+        WHERE {conditions} {emp_type_condition}
           AND dpd.employee IS NOT NULL
           ORDER BY dpd.employee_type ASC
     """, as_list=True)
@@ -226,7 +230,7 @@ def get_data(groups, filters):
             row[f"{scrubbed}_total"] = "".join(total_html)
 
             row[f"{scrubbed}_bill_num"] = sum(p["quantity"] for p in processes)
-            row[f"{scrubbed}_bill_dzn_num"] = sum(p["quantitydzn"] for p in processes)
+            row[f"{scrubbed}_bill_dzn_num"] = round(sum(p["quantitydzn"] for p in processes),1)
             row[f"{scrubbed}_total_num"] = sum(p["amount"] for p in processes)
 
         data.append(row)

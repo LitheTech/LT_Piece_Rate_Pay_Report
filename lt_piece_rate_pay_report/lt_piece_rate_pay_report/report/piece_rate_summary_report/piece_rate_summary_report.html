@@ -23,19 +23,19 @@
 		
 		<tr>
             {% if (!is_null(filters.start_date)) { %}
-					<th class="text-left" colspan="2"><font size="+.5">Date: {%= filters.start_date %}</font></th>
+					<th class="text-left" colspan="2"><font size="+.5">from: {%= filters.start_date %}</font></th>
 			{% } %}
 			{% if (!is_null(filters.end_date)) { %}
-					<th class="text-left" colspan="2"><font size="+.5">Department: {%= filters.end_date %}</font></th>
+					<th class="text-left" colspan="2"><font size="+.5">To: {%= filters.end_date %}</font></th>
 			{% } %}
 			{% if (!is_null(filters.process_type)) { %}
-					<th class="text-left"><font size="+.5">Group: {%= filters.process_type %}</font></th>
+					<th class="text-left"><font size="+.5">Process Type: {%= filters.process_type %}</font></th>
 			{% } %}
 			{% if (!is_null(filters.floor)) { %}
-					<th class="text-left"colspan="2"><font size="+.5">Employee: {%= filters.floor %}</font></th>
+					<th class="text-left"colspan="2"><font size="+.5">Floor: {%= filters.floor %}</font></th>
 			{% } %}
 			{% if (!is_null(filters.line)) { %}
-					<th class="text-left" colspan="2"><font size="+.5">Status: {%= filters.line %}</font></th>
+					<th class="text-left" colspan="2"><font size="+.5">Line: {%= filters.line %}</font></th>
 			{% } %}
 		</tr>
 		<tr>

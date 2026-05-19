@@ -62,6 +62,13 @@ frappe.query_reports["Working Sheet"] = {
 			"options": "Company",
 			// "default": frappe.defaults.get_user_default("Company"),
 		},
+		{
+            "fieldname": "employee_type",
+            "label": __("Employee Type"),
+            "fieldtype": "Select",
+            "options": "\nSalary\nContract",
+            "default": ""
+        }
 		// {
 		// 	"fieldname": "process",
 		// 	"fieldtype": "Link",
