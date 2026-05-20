@@ -68,8 +68,7 @@ def get_data(filters):
                 ROUND(
                     (SUM(dp.total_amount) / 
                     NULLIF(SUM(CASE WHEN dp.is_revised = 1 THEN 0 ELSE dp.bill_quantity END), 0)
-                    ) * 12,
-                    1
+                    ),1
                 ) AS pcs_rate,
 
                 SUM(metrics.contract_amount) AS bill,
@@ -133,7 +132,7 @@ def get_data(filters):
                 ROUND((CASE WHEN dp.is_revised = 1 THEN 0 ELSE dp.bill_quantity END / 12), 1) AS bill_qty_dzn,
                 CASE 
                     WHEN dp.is_revised = 1 OR dp.bill_quantity = 0 THEN 0 
-                    ELSE ROUND((dp.total_amount * 12) / dp.bill_quantity, 1) 
+                    ELSE ROUND(dp.total_amount / dp.bill_quantity, 1) 
                 END AS pcs_rate,
 
                 IFNULL(metrics.contract_amount, 0) AS bill,
