@@ -86,7 +86,8 @@
         buyer_groups.push(report_columns.slice(i, i + (max_buyers_per_page * 8)));
     }
 %}
-
+{% let all_total_val = 0; %}
+{% let all_total_qty = 0; %}
 {% for (let g = 0; g < buyer_groups.length; g++) { %}
 <div class="page-break">
     <table class="table table-bordered">
@@ -286,6 +287,7 @@
                         {% const col = buyer_groups[g][i]; %}
                         {% let qty = flt(row[col.fieldname]); %}
                         {% total_qty += qty; %}
+                        {% all_total_qty += qty; %}
                     {% } %}
 
                     {% if (pos == 7) { %} 
@@ -293,6 +295,7 @@
                         {% let val = flt(row[col.fieldname]); %}
                         <!-- {%= val %} -->
                         {% total_val += val; %}
+                        {% all_total_val += val; %}
                     {% } %}
 
                 {% } %}
@@ -311,3 +314,11 @@
     </table>
 </div>
 {% } %}
+<div style="font-size: medium; padding-top: 40px;">
+            <p class="text-center">
+                  Grand Total Amount = {%= frappe.format(all_total_val, {fieldtype: "Integer"}) %}
+            </p>
+            <p class="text-center">
+                  Grand Total Quantity = {%= frappe.format(all_total_qty, {fieldtype: "Integer"}) %}
+            </p>
+</div>

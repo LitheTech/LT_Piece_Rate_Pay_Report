@@ -160,15 +160,16 @@ def get_data(filters):
                     first_dp.parent_name,
                     SUM(10) AS stamp_deduct
                 FROM (
+                    -- Find the exact first document for employees whose TOTAL earnings cross 1000
                     SELECT 
                         dpd.employee, 
                         MIN(dp.name) AS parent_name
                     FROM `tabDaily Production Details` dpd
                     JOIN `tabDaily Production` dp ON dpd.parent = dp.name
-                    WHERE dpd.amount > 1000 
-                      AND dpd.employee_type = 'contract'
-                      AND %s
+                    WHERE dpd.employee_type = 'contract'
+                    AND %s
                     GROUP BY dpd.employee
+                    HAVING SUM(dpd.amount) >= 1000  -- Checks total aggregated earnings instead of individual rows
                 ) first_dp
                 GROUP BY first_dp.parent_name
             ) stamp_metrics ON dp.name = stamp_metrics.parent_name

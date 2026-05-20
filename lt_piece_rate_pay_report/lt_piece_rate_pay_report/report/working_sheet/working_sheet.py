@@ -106,7 +106,7 @@ def get_columns(filters):
             {"label": f" $ Total", "fieldname": f"{scrubbed}_total", "fieldtype": "Small Text", "width": 110},
 
             {"label": f"$ Bill Qty_num", "fieldname": f"{scrubbed}_bill_num", "fieldtype": "Integer", "width": 90},
-            {"label": f"$ Bill Qty Dzn_num", "fieldname": f"{scrubbed}_bill_dzn_num", "fieldtype": "Float", "width": 90},
+            {"label": f"$ Bill Qty Dzn_num", "fieldname": f"{scrubbed}_bill_dzn_num", "fieldtype": "Float", "precision":1, "width": 90},
             {"label": f" $ Total_num", "fieldname": f"{scrubbed}_total_num", "fieldtype": "Integer", "width": 110},
         ]
 
