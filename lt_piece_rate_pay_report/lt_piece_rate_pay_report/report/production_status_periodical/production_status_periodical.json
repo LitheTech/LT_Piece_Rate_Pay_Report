@@ -1,5 +1,5 @@
 {
- "add_total_row": 0,
+ "add_total_row": 1,
  "columns": [],
  "creation": "2026-04-25 13:45:06.904314",
  "disable_prepared_report": 0,
@@ -9,7 +9,7 @@
  "filters": [],
  "idx": 0,
  "is_standard": "Yes",
- "modified": "2026-04-25 13:46:57.426564",
+ "modified": "2026-05-20 15:25:48.304630",
  "modified_by": "Administrator",
  "module": "Lt Piece Rate Pay Report",
  "name": "Production Status Periodical",

@@ -21,7 +21,7 @@ def get_columns():
         _("Process Type") + ":Data:90",
         _("Line") + ":Data:90",
         _("Buyer") + ":Data:200",
-		_("Sales Contract") + ":Data:90",
+        _("Sales Contract") + ":Data:90",
         _("Po") + ":Data:200",
         _("Style") + ":Data:90",
 
@@ -89,22 +89,22 @@ def get_data(filters):
                 GROUP BY parent
             ) metrics ON dp.name = metrics.parent
 
-            -- Global stamp deduction logic based on the FIRST occurrence of the employee
+            -- Per-line stamp deduction logic (Total Mode)
             LEFT JOIN (
                 SELECT 
                     first_dp.parent_name,
                     SUM(10) AS stamp_deduct
                 FROM (
-                    -- Subquery to find the exact first document where an employee gets deducted
                     SELECT 
-                        dpd.employee, 
+                        dpd.employee,
+                        dp.facility_or_line,
                         MIN(dp.name) AS parent_name
                     FROM `tabDaily Production Details` dpd
                     JOIN `tabDaily Production` dp ON dpd.parent = dp.name
-                    WHERE dpd.amount > 1000 
-                      AND dpd.employee_type = 'contract'
+                    WHERE dpd.employee_type = 'contract'
                       AND %s
-                    GROUP BY dpd.employee
+                    GROUP BY dpd.employee, dp.facility_or_line
+                    HAVING SUM(dpd.amount) >= 1000 
                 ) first_dp
                 GROUP BY first_dp.parent_name
             ) stamp_metrics ON dp.name = stamp_metrics.parent_name
@@ -154,22 +154,22 @@ def get_data(filters):
                 GROUP BY parent
             ) metrics ON dp.name = metrics.parent
 
-            -- Global stamp deduction logic based on the FIRST occurrence of the employee
+            -- Per-line stamp deduction logic (Detail Mode)
             LEFT JOIN (
                 SELECT 
                     first_dp.parent_name,
                     SUM(10) AS stamp_deduct
                 FROM (
-                    -- Find the exact first document for employees whose TOTAL earnings cross 1000
                     SELECT 
                         dpd.employee, 
+                        dp.facility_or_line,
                         MIN(dp.name) AS parent_name
                     FROM `tabDaily Production Details` dpd
                     JOIN `tabDaily Production` dp ON dpd.parent = dp.name
                     WHERE dpd.employee_type = 'contract'
                     AND %s
-                    GROUP BY dpd.employee
-                    HAVING SUM(dpd.amount) >= 1000  -- Checks total aggregated earnings instead of individual rows
+                    GROUP BY dpd.employee, dp.facility_or_line
+                    HAVING SUM(dpd.amount) >= 1000
                 ) first_dp
                 GROUP BY first_dp.parent_name
             ) stamp_metrics ON dp.name = stamp_metrics.parent_name
