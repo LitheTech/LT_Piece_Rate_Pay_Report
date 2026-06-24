@@ -143,8 +143,11 @@
                 <th></th>
                 <th></th>
                 {% for (let i = 0; i < buyer_groups[g].length; i += 8) { %}
-                    <th class="text-center" colspan="5">
+                    <th class="text-center" colspan="3">
                         S/C : {%= (buyer_groups[g][i].label.split("$")[0]).split("^")[1] %}
+                    </th>
+                    <th class="text-center" colspan="2">
+                        Dp : {%= (buyer_groups[g][i].label.split("$")[0]).split("^")[2] %}
                     </th>
                 {% } %}
                 <th colspan="2"></th>

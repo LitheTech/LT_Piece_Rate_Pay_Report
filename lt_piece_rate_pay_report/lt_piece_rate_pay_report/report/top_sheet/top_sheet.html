@@ -2,7 +2,7 @@
 	var report_columns = report.get_columns_for_print();
 	report_columns = report_columns.filter(col => !col.hidden);
 
-	if (report_columns.length > 10) {
+	if (report_columns.length > 15) {
 		frappe.throw(__("Too many columns. Export the report and print it using a spreadsheet application."));
 	}
 %}
@@ -15,6 +15,7 @@
     }
 	.table {
         width: 97%;
+		font-size: 7.5px;
     }
 	
 
@@ -22,23 +23,26 @@
 
 <table class="table table-bordered">
 	<thead>
-		<tr><th class="text-center" colspan="10"><font size="+1">{%= __(report.report_name) %}</font></th></tr>
+		<tr><th class="text-center" colspan="15">{%= __(report.report_name) %}</th></tr>
 		
 		<tr>
             {% if (!is_null(filters.start_date)) { %}
 					<th class="text-left" colspan="3">From:{%= filters.start_date %}</th>
 			{% } %}
 			{% if (!is_null(filters.end_date)) { %}
-					<th class="text-left" colspan="2">To: {%= filters.end_date %}</th>
+					<th class="text-left" colspan="3">To: {%= filters.end_date %}</th>
 			{% } %}
 			{% if (!is_null(filters.process_type)) { %}
-					<th class="text-left">Process: {%= filters.process_type %}</th>
+					<th class="text-left" colspan="3">Process: {%= filters.process_type %}</th>
 			{% } %}
 			{% if (!is_null(filters.floor)) { %}
 					<th class="text-left"colspan="2">Floor: {%= filters.floor %}</th>
 			{% } %}
 			{% if (!is_null(filters.line)) { %}
 					<th class="text-left" colspan="2">Line: {%= filters.line %}</th>
+			{% } %}
+			{% if (!is_null(filters.buyer)) { %}
+					<th class="text-left" colspan="2">Line: {%= filters.buyer %}</th>
 			{% } %}
 		</tr>
 		<tr>
@@ -83,6 +87,4 @@
 		{% } %}
 	</tbody>
 </table>
-<p style="font-size: +1;"><b>
-    {%= frappe.format(data[data.length - 2]["employee_name"], report_columns[1], {}, data[data.length - 2]) %}
-</b></p>
+

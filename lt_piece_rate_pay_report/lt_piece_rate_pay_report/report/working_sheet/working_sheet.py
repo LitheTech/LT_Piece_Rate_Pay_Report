@@ -96,7 +96,7 @@ def get_columns(filters):
 
         scrubbed = frappe.scrub(f"{dp_name}")
 
-        header = f"{buyer}^{sales_contract} $ {po} | {color_string}${total_qty}${com_qty}${bill_qty}"
+        header = f"{buyer}^{sales_contract}^{dp_name} $ {po} | {color_string}${total_qty}${com_qty}${bill_qty}"
 
         columns += [
             {"label": f"{header} $ Operation Name", "fieldname": f"{scrubbed}_operation", "fieldtype": "Small Text", "width": 140},
@@ -141,6 +141,7 @@ def get_data(groups, filters):
             dpd.employee_name,
             dpd.process_name,
             dp.name as dp_name,
+            dp.is_revised,
             CAST(dpd.quantity AS SIGNED) AS quantity,
             ROUND(dpd.quantity / 12, 1) AS quantitydzn,
             dpd.rate,
@@ -164,6 +165,7 @@ def get_data(groups, filters):
             "quantitydzn": round(r.quantitydzn or 0, 1),
             "rate": r.rate or 0,
             "amount": round(r.amount or 0, 0),
+            "is_revised": r.is_revised,
         })
 
     data = []
@@ -188,6 +190,8 @@ def get_data(groups, filters):
 
             for p in processes:
                 p_name = str(p["process_name"] or "")
+
+                revised_style = 'background-color: #fef08a;' if p.get("is_revised") else ''
                 
                 # Check if process name is long (more than 5 characters)
                 if len(p_name) > 17:
@@ -202,7 +206,7 @@ def get_data(groups, filters):
                     formatted_name = f"{line_1}<br>{line_2}"
                     
                     # We add 'white-space: normal' to ensure the browser respects the layout
-                    op_html.append(f'<div class="line-cell" style="white-space: normal; word-break: break-all;">{formatted_name}</div>')                    
+                    op_html.append(f'<div class="line-cell" style="white-space: normal; word-break: break-all;{revised_style}">{formatted_name}</div>')                    
                     # 2. Add the quantity and a filler &nbsp; to match the height of the wrapped text
                     bill_html.append(f'<div>{p["quantity"]}</div>')
                     bill_html.append('<div class="line-cell">&nbsp;</div>')
@@ -217,7 +221,7 @@ def get_data(groups, filters):
                     total_html.append('<div class="line-cell">&nbsp;</div>')
                 else:
                     # Normal behavior for short names
-                    op_html.append(f'<div class="line-cell">{p_name}</div>')
+                    op_html.append(f'<div class="line-cell" style="{revised_style}">{p_name}</div>')
                     bill_html.append(f'<div class="line-cell">{p["quantity"]}</div>')
                     bill_dzn_html.append(f'<div class="line-cell">{p["quantitydzn"]}</div>')
                     rate_html.append(f'<div class="line-cell">{p["rate"]}</div>')
