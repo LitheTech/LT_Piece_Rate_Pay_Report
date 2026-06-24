@@ -1,90 +1,93 @@
 {%
-	var report_columns = report.get_columns_for_print();
-	report_columns = report_columns.filter(col => !col.hidden);
+    var report_columns = report.get_columns_for_print();
+    report_columns = report_columns.filter(col => !col.hidden);
 
-	if (report_columns.length > 15) {
-		frappe.throw(__("Too many columns. Export the report and print it using a spreadsheet application."));
-	}
+    if (report_columns.length > 15) {
+        frappe.throw(__("Too many columns. Export the report and print it using a spreadsheet application."));
+    }
 %}
 
-
-
 <style>
-    tr, td{
-        border: 1px solid black;
+    /*  */
+    .table {
+        width: 100%;
+        table-layout: fixed; /* Forces the table to stay exactly within page width */
+        border-collapse: collapse;
+        font-size: 7px; /* Kept compact to fit all 15 columns */
     }
-	.table {
-        width: 97%;
-		font-size: 7.5px;
+    tr, th, td {
+        border: 1px solid #000000 !important;
+        word-wrap: break-word; /* Traditional wrapping */
+        word-break: break-all; /* Forces word breaking anywhere if text overflows */
+        white-space: normal !important; /* Overrides Frappe's default white-space: nowrap */
+        vertical-align: middle;
     }
-	
-
+    th {
+        font-weight: bold;
+    }
 </style>
 
-<table class="table table-bordered">
-	<thead>
-		<tr><th class="text-center" colspan="15">{%= __(report.report_name) %}</th></tr>
-		
-		<tr>
-            {% if (!is_null(filters.start_date)) { %}
-					<th class="text-left" colspan="3">From:{%= filters.start_date %}</th>
-			{% } %}
-			{% if (!is_null(filters.end_date)) { %}
-					<th class="text-left" colspan="3">To: {%= filters.end_date %}</th>
-			{% } %}
-			{% if (!is_null(filters.process_type)) { %}
-					<th class="text-left" colspan="3">Process: {%= filters.process_type %}</th>
-			{% } %}
-			{% if (!is_null(filters.floor)) { %}
-					<th class="text-left"colspan="2">Floor: {%= filters.floor %}</th>
-			{% } %}
-			{% if (!is_null(filters.line)) { %}
-					<th class="text-left" colspan="2">Line: {%= filters.line %}</th>
-			{% } %}
-			{% if (!is_null(filters.buyer)) { %}
-					<th class="text-left" colspan="2">Line: {%= filters.buyer %}</th>
-			{% } %}
-		</tr>
-		<tr>
-			<th>Sl No</th>
-			{% for (let i=0, l=report_columns.length; i<l; i++) { %}
-				<th class="text-center">{%= report_columns[i].label %}</th>
-			{% } %}
-		</tr>
-	</thead>
-	<tbody>
-		{% for(let j=0, k=data.length; j<k; j++) { %}
-			{% const row = data[j]; %}
-
-			{% if (j === data.length - 2) { continue; } %}
-		
-			{% if (j === data.length - 1) { %}
-				<tr>
-					<td>Total</td>
-			{% } else { %}
-				<tr style="height: 90px;">
-					<td class="text-center" >{%= j+1 %}</td>
-			{% } %}		
-		
-				{% for(let i=0, l=report_columns.length; i<l-1; i++) { %}
-				{% if (i === l - 2 || i ===l-3) { %}
-					<td style="text-align: center; font-weight:bold;">
-				{% } else { %}
-					<td style="text-align: center;">
-
-				{% } %}	
-						{% const fieldname = report_columns[i].fieldname; %}
-						{% if (!is_null(row[fieldname])) { %}
-							{%= frappe.format(row[fieldname], report_columns[i], {}, row) %}
-						{% } %}
-					</td>
-				{% } %}
-				<td></td>
-
-				
-			</tr>
-			
-		{% } %}
-	</tbody>
-</table>
-
+<div class="table-container">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th class="text-center" colspan="15">{%= __(report.report_name) %}</th>
+            </tr>
+            <tr>
+                {% if (!is_null(filters.start_date)) { %}
+                        <th class="text-left" colspan="3">From: {%= filters.start_date %}</th>
+                {% } %}
+                {% if (!is_null(filters.end_date)) { %}
+                        <th class="text-left" colspan="3">To: {%= filters.end_date %}</th>
+                {% } %}
+                {% if (!is_null(filters.process_type)) { %}
+                        <th class="text-left" colspan="3">Process: {%= filters.process_type %}</th>
+                {% } %}
+                {% if (!is_null(filters.floor)) { %}
+                        <th class="text-left" colspan="2">Floor: {%= filters.floor %}</th>
+                {% } %}
+                {% if (!is_null(filters.line)) { %}
+                        <th class="text-left" colspan="2">Line: {%= filters.line %}</th>
+                {% } %}
+                {% if (!is_null(filters.buyer)) { %}
+                        <th class="text-left" colspan="2">Buyer: {%= filters.buyer %}</th>
+                {% } %}
+            </tr>
+            <tr>
+                <th style="width: 4%;">Sl No</th>
+                {% for (let i=0, l=report_columns.length; i<l; i++) { %}
+                    <th class="text-center">{%= report_columns[i].label %}</th>
+                {% } %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for(let j=0, k=data.length; j<k; j++) { %}
+                {% const row = data[j]; %}
+    
+                {% if (j === data.length - 2) { continue; } %}
+            
+                {% if (j === data.length - 1) { %}
+                    <tr style="font-weight: bold;">
+                        <td class="text-center">Total</td>
+                {% } else { %}
+                    <tr>
+                        <td class="text-center">{%= j+1 %}</td>
+                {% } %}     
+            
+                    {% for(let i=0, l=report_columns.length; i<l; i++) { %}
+                        {% if (i === l - 1 || i === l - 2) { %}
+                            <td style="text-align: center; font-weight: bold;">
+                        {% } else { %}
+                            <td style="text-align: center;">
+                        {% } %} 
+                            {% const fieldname = report_columns[i].fieldname; %}
+                            {% if (!is_null(row[fieldname])) { %}
+                                {%= frappe.format(row[fieldname], report_columns[i], {}, row) %}
+                            {% } %}
+                        </td>
+                    {% } %}
+                </tr>
+            {% } %}
+        </tbody>
+    </table>
+</div>

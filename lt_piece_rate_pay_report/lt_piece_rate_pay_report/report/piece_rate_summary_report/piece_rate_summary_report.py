@@ -27,9 +27,9 @@ def get_columns():
         {"label": "Total Qty", "fieldname": "total_pieces", "fieldtype": "Integer", "width": 120},
         # {"label": "Total Dozen", "fieldname": "total_dozen", "fieldtype": "Float", "width": 120},
         {"label": "Amount Payable", "fieldname": "amount_payable", "fieldtype": "Integer", "width": 150},
-        {"label": "Stamp Deduction", "fieldname": "stamp_ded", "fieldtype": "Integer", "width": 150},
+        {"label": "Stamp Deduct", "fieldname": "stamp_ded", "fieldtype": "Integer", "width": 150},
         {"label": "Net Amount", "fieldname": "net_amount", "fieldtype": "Integer", "width": 150},
-        {"label": "Advance", "fieldname": "advance", "fieldtype": "Integer", "width": 150},
+        {"label": "Adv", "fieldname": "advance", "fieldtype": "Integer", "width": 150},
         {"label": "Payable After Deduct", "fieldname": "payable_after_deduct", "fieldtype": "Integer", "width": 150},
         {"label": "SIGNATURE", "fieldname": "singature", "fieldtype": "Data", "width": 150},
 
