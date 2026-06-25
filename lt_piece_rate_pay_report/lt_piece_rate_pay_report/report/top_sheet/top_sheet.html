@@ -8,9 +8,8 @@
 %}
 
 <style>
-    /*  */
     .table {
-        width: 100%;
+        width: 97%;
         table-layout: fixed; /* Forces the table to stay exactly within page width */
         border-collapse: collapse;
         font-size: 7px; /* Kept compact to fit all 15 columns */
@@ -29,16 +28,30 @@
 
 <div class="table-container">
     <table class="table table-bordered">
+        <colgroup>
+            <col style="width: 25px;"> {% for (let i=1, l=report_columns.length; i<l; i++) { %}
+                {% if (report_columns[i].fieldname === 'style' || report_columns[i].label.toLowerCase().includes('style')) { %}
+                    <col style="width: 160px;"> {% } 
+                    else if ( report_columns[i].fieldname === 'sales_contract') { %}
+                    <col style="width: 55px;"> 
+                    {% }
+                     else if ( report_columns[i].fieldname === 'pcs_rate') { %}
+                    <col style="width: 30px;"> 
+                    {% } else { %}
+                    <col style="width: 40px;"> {% } %}
+            {% } %}
+        </colgroup>
+
         <thead>
             <tr>
-                <th class="text-center" colspan="15">{%= __(report.report_name) %}</th>
+                <th class="text-center" colspan="14">{%= __(report.report_name) %}</th>
             </tr>
             <tr>
                 {% if (!is_null(filters.start_date)) { %}
                         <th class="text-left" colspan="3">From: {%= filters.start_date %}</th>
                 {% } %}
                 {% if (!is_null(filters.end_date)) { %}
-                        <th class="text-left" colspan="3">To: {%= filters.end_date %}</th>
+                        <th class="text-left" colspan="2">To: {%= filters.end_date %}</th>
                 {% } %}
                 {% if (!is_null(filters.process_type)) { %}
                         <th class="text-left" colspan="3">Process: {%= filters.process_type %}</th>
@@ -54,8 +67,8 @@
                 {% } %}
             </tr>
             <tr>
-                <th style="width: 4%;">Sl No</th>
-                {% for (let i=0, l=report_columns.length; i<l; i++) { %}
+                <th>Sl No</th>
+                {% for (let i=1, l=report_columns.length; i<l; i++) { %}
                     <th class="text-center">{%= report_columns[i].label %}</th>
                 {% } %}
             </tr>
@@ -67,14 +80,14 @@
                 {% if (j === data.length - 2) { continue; } %}
             
                 {% if (j === data.length - 1) { %}
-                    <tr style="font-weight: bold;">
-                        <td class="text-center">Total</td>
+                    <tr>
+                        <td>Tot</td>
                 {% } else { %}
                     <tr>
                         <td class="text-center">{%= j+1 %}</td>
                 {% } %}     
             
-                    {% for(let i=0, l=report_columns.length; i<l; i++) { %}
+                    {% for(let i=1, l=report_columns.length; i<l; i++) { %}
                         {% if (i === l - 1 || i === l - 2) { %}
                             <td style="text-align: center; font-weight: bold;">
                         {% } else { %}
