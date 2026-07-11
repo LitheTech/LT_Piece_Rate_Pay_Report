@@ -18,6 +18,7 @@ def execute(filters=None):
 def get_columns():
 	return [
         _("Production Date") + ":Data:130",
+        _("DP") + ":Data:130",
         _("Color") + ":Data:150",
         _("Process Type") + ":Data:100",
 		_("Floor") + ":Data:70",
@@ -42,6 +43,7 @@ def get_data(filters):
 	result = frappe.db.sql("""
         SELECT 
             dp.production_date,
+            dp.name,
             dpc.color,
             dp.process_type,
 			dp.floor,

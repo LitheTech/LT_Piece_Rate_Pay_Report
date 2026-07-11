@@ -54,11 +54,17 @@ def get_data(filters):
             SUM(ppi.amount) AS amount_payable,
             CASE WHEN SUM(ppi.amount) >= 1000 and cwss.employee_type = 'contract' THEN 10 ELSE 0 END AS stamp_ded,
             ROUND(SUM(ppi.amount) - (CASE WHEN SUM(ppi.amount) >= 1000 and cwss.employee_type = 'contract' THEN 10 ELSE 0 END), 0) AS net_amount,
-            ROUND(cwss.advance, 0) AS advance,
-            ROUND(SUM(ppi.amount) - cwss.advance - (CASE WHEN SUM(ppi.amount) >= 1000 and cwss.employee_type = 'contract' THEN 10 ELSE 0 END), 0) AS payable_after_deduct
+            ROUND(COALESCE(eap.amount, 0), 0) AS advance,
+            ROUND(SUM(ppi.amount) - ROUND(COALESCE(eap.amount, 0), 0) - (CASE WHEN SUM(ppi.amount) >= 1000 and cwss.employee_type = 'contract' THEN 10 ELSE 0 END), 0) AS payable_after_deduct
                                             
         FROM `tabContract Worker Salary Slip` cwss
         JOIN `tabProduction Pay Items` ppi ON cwss.name = ppi.parent
+                          
+        LEFT JOIN `tabEmployee Advance Payment` eap ON 
+            cwss.employee = eap.employee 
+            AND ppi.line = eap.facility_or_line 
+            AND ppi.floor = eap.floor 
+            AND cwss.contract_worker_payroll_entry = eap.contract_worker_payroll_entry
         WHERE %s AND total_amount > 0
         GROUP BY cwss.employee
     """ % conditions, as_dict=True)

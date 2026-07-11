@@ -18,6 +18,7 @@ def execute(filters=None):
 def get_columns():
 	return [
         _("Production Date") + ":Data:130",
+        _("DP") + ":Data:130",
         _("Buyer") + ":Data:200",
         _("Sales Contract") + ":Data:200",
         _("PO") + ":Data:200",
@@ -44,6 +45,7 @@ def get_data(filters):
 	result = frappe.db.sql("""
         SELECT 
             dp.production_date,
+            dp.name,
             dp.buyer,
             dp.sales_contract,
             dp.po,
