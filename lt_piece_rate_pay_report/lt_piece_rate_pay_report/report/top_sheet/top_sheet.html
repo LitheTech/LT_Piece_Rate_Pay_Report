@@ -78,9 +78,7 @@
             <tbody>
                 {% for(let j=0, k=data.length; j<k; j++) { %}
                     {% const row = data[j]; %}
-        
-                    {% if (j === data.length - 2) { continue; } %}
-                
+                     
                     {% if (j === data.length - 1) { %}
                         <tr>
                             <td>Tot</td>
@@ -145,9 +143,7 @@
             <tbody>
                 {% for(let j=0, k=data.length; j<k; j++) { %}
                     {% const row = data[j]; %}
-        
-                    {% if (j === data.length - 2) { continue; } %}
-                
+                        
                     {% if (j === data.length - 1) { %}
                         <tr style="font-weight: bold;">
                             <td class="text-center">Total</td>
