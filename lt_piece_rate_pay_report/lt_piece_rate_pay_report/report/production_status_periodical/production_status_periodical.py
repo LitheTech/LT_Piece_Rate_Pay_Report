@@ -28,7 +28,7 @@ def get_columns():
 		_("Floor") + ":Data:70",
 		_("Line") + ":Data:50",
         _("Total Qty") + ":Int:100",
-        _("Completed Qty") + ":Int:100",
+        _("Done Qty") + ":Int:100",
 		_("Bill Qty") + ":Int:100",
 		_("Remain Qty") + ":Int:100",
 

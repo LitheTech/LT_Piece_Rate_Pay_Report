@@ -1,0 +1,96 @@
+{%
+	var report_columns = report.get_columns_for_print();
+	report_columns = report_columns.filter(col => !col.hidden);
+
+	if (report_columns.length > 50) {
+		frappe.throw(__("Too many columns. Export the report and print it using a spreadsheet application."));
+	}
+%}
+
+
+
+<style>
+    tr, td{
+        border: 1px solid black;
+    }
+	.table {
+        width: 97%;
+    }
+	
+
+</style>
+
+<table class="table table-bordered">
+	<thead>
+		<tr><th class="text-center" colspan="15"><font size="+1">{%= __(report.report_name) %}</font></th></tr>
+		
+		<tr>
+            {% if (!is_null(filters.start_date)) { %}
+					<th class="text-left" colspan="2">From:{%= filters.start_date %}</th>
+			{% } %}
+			{% if (!is_null(filters.end_date)) { %}
+					<th class="text-left" colspan="2">To: {%= filters.end_date %}</th>
+			{% } %}
+			{% if (!is_null(filters.process_type)) { %}
+					<th class="text-left">Process: {%= filters.process_type %}</th>
+			{% } %}
+			{% if (!is_null(filters.floor)) { %}
+					<th class="text-left"colspan="2">Floor: {%= filters.floor %}</th>
+			{% } %}
+			{% if (!is_null(filters.line)) { %}
+					<th class="text-left" colspan="2">Line: {%= filters.line %}</th>
+			{% } %}
+            {% if (!is_null(filters.po_list)) { %}
+					<th class="text-left" colspan="2">Po: {%= filters.po_list %}</th>
+			{% } %}
+            {% if (!is_null(filters.style)) { %}
+					<th class="text-left" colspan="2">Style: {%= filters.style %}</th>
+			{% } %}
+            {% if (!is_null(filters.color)) { %}
+					<th class="text-left" colspan="2">Color: {%= filters.color %}</th>
+			{% } %}
+            {% if (!is_null(filters.company)) { %}
+					<th class="text-left" colspan="2">{%= filters.company %}</th>
+			{% } %}
+		</tr>
+		<tr>
+			<th>Sl No</th>
+			{% for (let i=0, l=report_columns.length; i<l; i++) { %}
+				<th class="text-center">{%= report_columns[i].label %}</th>
+			{% } %}
+		</tr>
+	</thead>
+	<tbody>
+		{% for(let j=0, k=data.length; j<k; j++) { %}
+			{% const row = data[j]; %}
+		
+			{% if (j === data.length - 1) { %}
+				<tr>
+					<td>Tot</td>
+			{% } else { %}
+					<td class="text-center" >{%= j+1 %}</td>
+			{% } %}		
+		
+				{% for(let i=0, l=report_columns.length; i<l; i++) { %}
+                    {% if ( i<l-4) { %}
+                    
+                        <td style="text-align: center; word-break: break-word; max-width: 150px;">
+                    {% } else { %}
+                
+                        <td style="text-align: center;">
+                    {% } %}	
+				
+						{% const fieldname = report_columns[i].fieldname; %}
+						{% if (!is_null(row[fieldname])) { %}
+							{%= frappe.format(row[fieldname], report_columns[i], {}, row) %}
+						{% } %}
+					</td>
+				{% } %}
+
+				
+			</tr>
+			
+		{% } %}
+	</tbody>
+</table>
+
