@@ -4,12 +4,17 @@
 
 frappe.query_reports["Piece Rate Summary Report"] = {
 	"filters": [
-        {
+         {
             "fieldname": "contract_worker_payroll_entry",
             "label": __("Contract Worker Payroll Entry"),
             "fieldtype": "Link",
             "options": "Contract Worker Payroll Entry",
-            "reqd": 1
+            "reqd": 1,
+            "get_query": function() {
+                return {
+                    query: "lt_piece_rate_pay_report.lt_piece_rate_pay_report.report.top_sheet.top_sheet.get_payroll_entries"
+                };
+            }
         },
          {
             "fieldname": "start_date",
@@ -74,14 +79,6 @@ frappe.query_reports["Piece Rate Summary Report"] = {
     ,
 	 onload: function(report) {
 
-        // ✅ Filter Contract Worker Payroll Entry (docstatus = 1)
-    report.get_filter('contract_worker_payroll_entry').get_query = function() {
-        return {
-            filters: {
-                docstatus: 1
-            }
-        };
-    };
 
         report.page.fields_dict.contract_worker_payroll_entry.df.onchange = () => {
             let selected = report.get_filter_value("contract_worker_payroll_entry");

@@ -27,7 +27,7 @@ def get_columns():
 
         _("Bill Qty (pcs)") + ":Int:100",
         {
-            "label": "Bill Qty(Dzn)",
+            "label": "Bill Qty (Dzn)",
             "fieldname": "bill_qty_dzn",
             "fieldtype": "Float",
             "precision": 1,
@@ -42,7 +42,7 @@ def get_columns():
         },
 
         _("Bill") + ":Int:100",
-        _("Stamp Deduct") + ":Int:100",
+        _("Stamp Ded") + ":Int:100",
         _("PC Bill") + ":Int:100",
         _("Salary") + ":Int:120",
         _("Total Bill") + ":Int:100",
@@ -72,10 +72,10 @@ def get_data(filters):
                 ) AS pcs_rate,
 
                 SUM(metrics.contract_amount) AS bill,
-                IFNULL(SUM(stamp_metrics.stamp_deduct), 0) AS stamp_deduct,
-                SUM(metrics.contract_amount) - IFNULL(SUM(stamp_metrics.stamp_deduct), 0) AS pc_bill,
+                IFNULL(SUM(stamp_metrics.stmap_ded), 0) AS stmap_ded,
+                SUM(metrics.contract_amount) - IFNULL(SUM(stamp_metrics.stmap_ded), 0) AS pc_bill,
                 SUM(metrics.salary_amount) AS salary,
-                SUM(dp.total_amount) - IFNULL(SUM(stamp_metrics.stamp_deduct), 0) AS total_bill
+                SUM(dp.total_amount) - IFNULL(SUM(stamp_metrics.stmap_ded), 0) AS total_bill
 
             FROM `tabDaily Production` dp
 
@@ -92,7 +92,7 @@ def get_data(filters):
             LEFT JOIN (
                 SELECT 
                     first_dp.parent_name,
-                    SUM(10) AS stamp_deduct
+                    SUM(10) AS stmap_ded
                 FROM (
                     SELECT 
                         dpd.employee,
@@ -136,10 +136,10 @@ def get_data(filters):
                 END AS pcs_rate,
 
                 IFNULL(metrics.contract_amount, 0) AS bill,
-                IFNULL(stamp_metrics.stamp_deduct, 0) AS stamp_deduct,
-                IFNULL(metrics.contract_amount, 0) - IFNULL(stamp_metrics.stamp_deduct, 0) AS pc_bill,
+                IFNULL(stamp_metrics.stmap_ded, 0) AS stmap_ded,
+                IFNULL(metrics.contract_amount, 0) - IFNULL(stamp_metrics.stmap_ded, 0) AS pc_bill,
                 IFNULL(metrics.salary_amount, 0) AS salary,
-                dp.total_amount - IFNULL(stamp_metrics.stamp_deduct, 0) AS total_bill
+                dp.total_amount - IFNULL(stamp_metrics.stmap_ded, 0) AS total_bill
 
             FROM `tabDaily Production` dp
 
@@ -157,7 +157,7 @@ def get_data(filters):
             LEFT JOIN (
                 SELECT 
                     first_dp.parent_name,
-                    SUM(10) AS stamp_deduct
+                    SUM(10) AS stmap_ded
                 FROM (
                     SELECT 
                         dpd.employee, 
@@ -224,3 +224,17 @@ def get_conditions(filters):
         conditions += " AND dp.process_type = '%s'" % filters["process_type"]
 
     return conditions, filters
+
+
+
+
+@frappe.whitelist()
+@frappe.validate_and_sanitize_search_inputs
+def get_payroll_entries(doctype, txt, searchfield, start, page_len, filters):
+    # Fetch entries sorted by start_date DESC (latest first)
+    return frappe.db.sql("""
+        SELECT name
+        FROM `tabContract Worker Payroll Entry`
+        WHERE docstatus = 1
+        ORDER BY start_date DESC
+    """)

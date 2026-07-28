@@ -14,15 +14,31 @@
         border-collapse: collapse;
         font-size: 7px; /* Kept compact to fit all 15 columns */
     }
-    tr, th, td {
+
+    tr, td, th {
         border: 1px solid #000000 !important;
-        word-wrap: break-word; /* Traditional wrapping */
-        word-break: break-all; /* Forces word breaking anywhere if text overflows */
-        white-space: normal !important; /* Overrides Frappe's default white-space: nowrap */
+        white-space: normal !important; /* Allows text to wrap into multiple lines */
         vertical-align: middle;
     }
+
+    /* Column Headers styling */
     th {
         font-weight: bold;
+        text-align: center;
+        /* Keeps full words intact and only wraps between space separators */
+        word-break: keep-all !important; 
+        overflow-wrap: break-word !important; 
+    }
+
+    /* Table body cell styling */
+    td {
+        word-break: break-all; /* Keeps tight data wrapping for table rows */
+    }
+
+    tr td:nth-last-child(-n+8) {
+        white-space: nowrap !important;
+        word-break: normal !important;
+        overflow-wrap: normal !important;
     }
 </style>
  
@@ -36,11 +52,9 @@
                         <col style="width: 160px;"> {% } 
                         else if ( report_columns[i].fieldname === 'sales_contract') { %}
                         <col style="width: 55px;"> 
-                        {% }
-                        else if ( report_columns[i].fieldname === 'pcs_rate') { %}
-                        <col style="width: 30px;"> 
+                        
                         {% } else { %}
-                        <col style="width: 40px;"> {% } %}
+                        <col style="width: auto"> {% } %}
                 {% } %}
             </colgroup>
 
@@ -136,7 +150,7 @@
                 <tr>
                     <th style="width: 4%;">Sl No</th>
                     {% for (let i=0, l=report_columns.length; i<l; i++) { %}
-                        <th class="text-center">{%= report_columns[i].label %}</th>
+                        <th class="text-center" style="word-break: normal;">{%= report_columns[i].label %}</th>
                     {% } %}
                 </tr>
             </thead>
