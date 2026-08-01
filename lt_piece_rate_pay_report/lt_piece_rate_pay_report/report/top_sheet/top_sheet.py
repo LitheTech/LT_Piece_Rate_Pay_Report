@@ -36,7 +36,14 @@ def get_columns():
         _("Po") + ":Data:200",
         _("Style") + ":Data:90",
 
-        _("Bill Qty (pcs)") + ":Int:100",
+        # ("Bill Qty (pcs)") + ":Int:100",
+        {
+            "label": "Bill Qty (pcs)",
+            "fieldname": "bill_qty_pcs",
+            "fieldtype": "Int",
+            # "precision": 1,
+            "width": 100
+        },
         {
             "label": "Bill Qty (Dzn)",
             "fieldname": "bill_qty_dzn",
@@ -139,7 +146,7 @@ def get_data(filters):
                 dp.po,
                 dpc.style,
 
-                CASE WHEN dp.is_revised = 1 THEN 0 ELSE dp.bill_quantity END AS bill_quantity,
+                CASE WHEN dp.is_revised = 1 THEN 0 ELSE dp.bill_quantity END AS bill_qty_pcs,
                 ROUND((CASE WHEN dp.is_revised = 1 THEN 0 ELSE dp.bill_quantity END / 12), 1) AS bill_qty_dzn,
                 CASE 
                     WHEN dp.is_revised = 1 OR dp.bill_quantity = 0 THEN 0 
@@ -147,7 +154,7 @@ def get_data(filters):
                 END AS pcs_rate,
 
                 IFNULL(metrics.contract_amount, 0) AS bill,
-                IFNULL(stamp_metrics.stmap_ded, 0) AS stmap_ded,
+                IFNULL(stamp_metrics.stmap_ded, 0) AS stamp_ded,
                 IFNULL(metrics.contract_amount, 0) - IFNULL(stamp_metrics.stmap_ded, 0) AS pc_bill,
                 IFNULL(metrics.salary_amount, 0) AS salary,
                 dp.total_amount - IFNULL(stamp_metrics.stmap_ded, 0) AS total_bill
