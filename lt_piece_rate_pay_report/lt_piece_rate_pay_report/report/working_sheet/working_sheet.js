@@ -42,7 +42,8 @@ frappe.query_reports["Working Sheet"] = {
 			"label": "Floor",
 			"mandatory": 0,
 			"options": "Floor",
-			"wildcard_filter": 0
+			"wildcard_filter": 0,
+			"reqd": 1,
 		},
         {
 			"fieldname": "line",
@@ -50,7 +51,8 @@ frappe.query_reports["Working Sheet"] = {
 			"label": "Line",
 			"mandatory": 0,
 			"options": "Facility or Line",
-			"wildcard_filter": 0
+			"wildcard_filter": 0,
+			"reqd": 1,
 		},
         {
 			"fieldname": "process_type",

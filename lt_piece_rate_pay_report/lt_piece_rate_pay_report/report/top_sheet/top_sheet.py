@@ -3,6 +3,8 @@
 
 import frappe
 from frappe import _
+from frappe.utils import flt, money_in_words
+
 
 
 def execute(filters=None):
@@ -13,13 +15,22 @@ def execute(filters=None):
     columns = get_columns()
     data = get_data(filters)
 
+    total_payable = sum(flt(row.get("total_bill", 0)) for row in data)
+        
+    if data:
+        # Add a special row for the words at the end of the data list
+        data.append({
+            "process_type": "TOTAL_IN_WORDS", # We use this as a flag in HTML
+            "line": money_in_words(total_payable, "Taka = ")
+        })
+
     return columns, data
 
 
 def get_columns():
     return [
         _("Process Type") + ":Data:90",
-        _("Line") + ":Data:90",
+        _("Facility or Line") + ":Data:90",
         _("Buyer") + ":Data:200",
         _("Sales Contract") + ":Data:90",
         _("Po") + ":Data:200",
@@ -112,7 +123,7 @@ def get_data(filters):
                 %s
 
             GROUP BY dp.process_type
-        """ % (conditions, conditions), as_list=1)
+        """ % (conditions, conditions), as_dict=1)
 
     # =========================
     # DETAIL MODE
@@ -197,7 +208,7 @@ def get_data(filters):
             ),
             dp.facility_or_line ASC
 
-        """ % (conditions, conditions), as_list=1)
+        """ % (conditions, conditions), as_dict=True)
 
     return result
 

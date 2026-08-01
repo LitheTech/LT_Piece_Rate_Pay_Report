@@ -27,7 +27,6 @@ frappe.query_reports["Production Status Details"] = {
 			fieldname: "style_list",
 			label: __("Style"),
 			fieldtype: "Select",
-			reqd: 1,
 
 			on_change: function () {
 				// ✅ Reset color filter

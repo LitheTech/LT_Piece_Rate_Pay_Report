@@ -315,13 +315,11 @@
         </tbody>
 
     </table>
+    <table class="table table-bordered">
+        <tr>
+            <td>Grand Total Amount = {%= frappe.format(all_total_val, {fieldtype: "Integer"}) %}</td>
+            <td>Grand Total Quantity = {%= frappe.format(all_total_qty, {fieldtype: "Integer"}) %}</td>
+        </tr>
+    </table>
 </div>
 {% } %}
-<div style="font-size: medium; padding-top: 40px;">
-            <p class="text-center">
-                  Grand Total Amount = {%= frappe.format(all_total_val, {fieldtype: "Integer"}) %}
-            </p>
-            <p class="text-center">
-                  Grand Total Quantity = {%= frappe.format(all_total_qty, {fieldtype: "Integer"}) %}
-            </p>
-</div>
