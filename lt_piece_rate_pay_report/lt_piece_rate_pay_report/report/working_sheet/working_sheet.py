@@ -269,4 +269,7 @@ def get_conditions(filters):
     if filters.get("company"):
         conditions += " AND dp.company = '%s'" % filters["company"]
 
+    if filters.get("status"):
+            conditions += " AND dp.workflow_state = '%s'" % filters["status"]
+    
     return conditions, filters

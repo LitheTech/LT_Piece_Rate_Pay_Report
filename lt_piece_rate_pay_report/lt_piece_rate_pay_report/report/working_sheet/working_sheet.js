@@ -75,6 +75,13 @@ frappe.query_reports["Working Sheet"] = {
             "fieldtype": "Select",
             "options": "\nSalary\nContract",
             "default": ""
+        },
+		{
+            "fieldname": "status",
+            "label": __("Status"),
+            "fieldtype": "Select",
+            "options": "\nDraft\nApproved",
+            "default": "Approved"
         }
 		// {
 		// 	"fieldname": "process",

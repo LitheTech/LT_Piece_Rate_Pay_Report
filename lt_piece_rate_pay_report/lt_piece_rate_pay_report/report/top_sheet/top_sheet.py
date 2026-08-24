@@ -232,6 +232,9 @@ def get_conditions(filters):
     if filters.get("floor"):
         conditions += " AND dp.floor = '%s'" % filters["floor"]
 
+    if filters.get("status"):
+        conditions += " AND dp.workflow_state = '%s'" % filters["status"]
+
     if filters.get("line"):
         conditions += " AND dp.facility_or_line = '%s'" % filters["line"]
 

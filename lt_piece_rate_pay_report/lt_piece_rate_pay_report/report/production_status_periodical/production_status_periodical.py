@@ -63,7 +63,7 @@ def get_data(filters):
         JOIN `tabDaily Production Colors` dpc 
             ON dpc.parent = dp.name
         WHERE %s
-		ORDER BY FIELD(process_type, 'cutting', 'sewing', 'iron');
+		ORDER BY FIELD(process_type, 'cutting', 'sewing', 'iron'),dp.name;
     """ % conditions, as_list=1)
 
 	return result
@@ -83,6 +83,8 @@ def get_conditions(filters):
 	if filters.get("floor"):conditions += " AND dp.floor = '%s'" % filters["floor"]
 	if filters.get("line"):conditions += " AND dp.facility_or_line = '%s'" % filters["line"]
 	if filters.get("company"): conditions += " AND dp.company = '%s'" % filters["company"]
+	if filters.get("status"):conditions += " AND dp.workflow_state = '%s'" % filters["status"]
+      
 	return conditions, filters
 
 

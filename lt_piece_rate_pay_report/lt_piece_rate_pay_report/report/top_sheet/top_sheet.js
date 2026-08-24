@@ -85,6 +85,13 @@ frappe.query_reports["Top Sheet"] = {
 			// "default": frappe.defaults.get_user_default("Company"),
 			// "reqd": 1
 		},
+        {
+            "fieldname": "status",
+            "label": __("Status"),
+            "fieldtype": "Select",
+            "options": "\nDraft\nApproved",
+            "default": "Approved"
+        },
 		{
 			"fieldname": "show_total",
 			"fieldtype": "Check",

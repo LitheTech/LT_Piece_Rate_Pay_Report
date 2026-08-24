@@ -81,6 +81,13 @@ frappe.query_reports["Production Status Periodical"] = {
 			options: "Company",
 			// default: frappe.defaults.get_user_default("Company"),
 		},
+		{
+            "fieldname": "status",
+            "label": __("Status"),
+            "fieldtype": "Select",
+            "options": "\nDraft\nApproved",
+            "default": "Approved"
+        },
 	]
 };
 

@@ -118,7 +118,7 @@ def get_data(filters):
 
 
 def get_conditions(filters):
-    conditions = "1=1"
+    conditions = "1=1 AND dp.workflow_state='Approved'"
     params = {}
 
     if filters.get("sales_contract"):

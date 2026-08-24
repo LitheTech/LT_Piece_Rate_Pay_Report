@@ -57,13 +57,13 @@ def get_data(filters):
         JOIN `tabDaily Production Colors` dpc 
             ON dpc.parent = dp.name
         WHERE %s
-		ORDER BY FIELD(process_type, 'cutting', 'sewing', 'iron');
+		ORDER BY FIELD(process_type, 'cutting', 'sewing', 'iron'),dp.name;
     """ % conditions, as_list=1)
 
 	return result
 
 def get_conditions(filters):
-	conditions="1=1" 
+	conditions="1=1 AND dp.workflow_state='Approved'" 
 	if filters.get("po_list"):conditions += " AND dp.po = '%s'" % filters["po_list"]
 	if filters.get("style_list"):conditions += " AND dpc.style = '%s'" % filters["style_list"]
 	if filters.get("color"):conditions += " AND dpc.color LIKE CONCAT('%%', {0}, '%%')".format(

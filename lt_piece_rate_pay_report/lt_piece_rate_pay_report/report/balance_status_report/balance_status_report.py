@@ -171,7 +171,7 @@ def get_data(filters):
 
 
 def get_conditions(filters):
-    conditions = "1=1"
+    conditions = "1=1 AND dp.workflow_state='Approved' "
     params = {}
     po_query="1=1"
     if filters.get("buyer"):
