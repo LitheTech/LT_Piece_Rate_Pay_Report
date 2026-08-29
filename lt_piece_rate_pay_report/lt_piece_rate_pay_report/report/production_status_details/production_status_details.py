@@ -29,6 +29,7 @@ def get_columns():
         _("Completed Qty") + ":Int:100",
 		_("Bill Qty") + ":Int:100",
 		_("Remain Qty") + ":Int:100",
+        _("Revised Qty") + ":Int:100",
 
         # _("Stamp Deduct") + ":Int:100",
 		# _("Total Bill") + ":Int:100",
@@ -50,9 +51,9 @@ def get_data(filters):
 			dp.facility_or_line,
             dpc.color_quantity,
             dpc.done_quantity,
-            dpc.ongoing_quantity,
-			dpc.color_quantity-dpc.done_quantity-dpc.ongoing_quantity
-            
+            CASE WHEN is_revised = 1 THEN 0 ELSE dpc.ongoing_quantity END,
+            (dpc.color_quantity - dpc.done_quantity - (CASE WHEN is_revised = 1 THEN 0 ELSE dpc.ongoing_quantity END)) AS remain_qty,
+            CASE WHEN is_revised = 1 THEN (dpc.ongoing_quantity) ELSE 0 END
         FROM `tabDaily Production` dp
         JOIN `tabDaily Production Colors` dpc 
             ON dpc.parent = dp.name
