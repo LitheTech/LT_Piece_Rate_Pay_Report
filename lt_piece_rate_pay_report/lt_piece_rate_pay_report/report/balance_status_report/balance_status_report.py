@@ -44,13 +44,33 @@ def get_columns():
 
 def get_data(filters):
 
-    master_processes = ["Cutting", "Sewing", "Iron"]
-
     prod_conditions, prod_params,po_query = get_conditions(filters)
     # -------------------------------------------------
     # PO DATA
     # -------------------------------------------------
 
+    # Fetch all distinct process types dynamically
+    if filters.get("process_type"):
+        master_processes = [filters.get("process_type")]
+    else:
+        raw_processes = frappe.db.get_all(
+            "Daily Production", 
+            pluck="process_type", 
+            distinct=True
+        )
+        unique_processes = {p.strip().title() for p in raw_processes if p}
+
+        # Serial priority order: Cutting -> Sewing -> Iron
+        priority_order = ["Cutting", "Sewing", "Iron"]
+
+        # Extract fixed priority processes that exist in the DB
+        ordered_priority = [p for p in priority_order if p in unique_processes]
+
+        # Extract remaining dynamic processes sorted alphabetically
+        remaining = sorted(list(unique_processes - set(priority_order)))
+
+        # Combine priority list with remaining items
+        master_processes = ordered_priority + remaining
     po_items = frappe.db.sql("""
         SELECT
             p.name AS po,
