@@ -86,7 +86,10 @@ def get_data(filters):
                 dpc.style, 
                 dpc.color, 
                 dp.process_type,
-                dpc.ongoing_quantity as ongoing_qty,
+                CASE 
+                    WHEN IFNULL(dp.is_revised, 0) = 1 THEN 0 
+                    ELSE IFNULL(dpc.ongoing_quantity, 0) 
+                END as ongoing_qty,
                 /* Calculation per DP record: (Total Amt / Bill Qty) * Ongoing Qty */
                 CASE 
                     WHEN IFNULL(dp.bill_quantity, 0) > 0 
@@ -126,6 +129,12 @@ def get_data(filters):
 
             key = (item.po, item.style, item.color, process)
             prod_values = prod_map.get(key, {"quantity": 0, "bill_amount": 0})
+
+            qty = prod_values["quantity"]
+
+            # Filter out zero quantity rows
+            if not qty or flt(qty) == 0:
+                continue
 
             data.append({
                 "process_type": process,

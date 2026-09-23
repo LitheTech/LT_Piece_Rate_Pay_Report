@@ -9,7 +9,7 @@ frappe.query_reports["Production Payment Details"] = {
 			label: __("	Sales Contract	"),
 			fieldtype: "Link",
 			options: "Sales Contract",
-			reqd: 1,
+			// reqd: 1,
 		},
 		{
 			fieldname: "po_list",
@@ -31,6 +31,17 @@ frappe.query_reports["Production Payment Details"] = {
 			on_change: function () {
 				frappe.query_report.set_filter_value("style", "");
 				frappe.query_report.set_filter_value("color", "");
+				
+				var po_list = frappe.query_report.get_filter_value("po_list");
+					if (po_list) {
+						// Fetch and set sales_contract dynamically
+						frappe.db.get_value("PO List", po_list, "sales_contract", function (r) {
+							if (r && r.sales_contract) {
+								frappe.query_report.set_filter_value("sales_contract", r.sales_contract);
+							}
+						});
+					}
+
 				load_styles();   // ✅ FIX 1
 				frappe.query_report.refresh();
 			}
