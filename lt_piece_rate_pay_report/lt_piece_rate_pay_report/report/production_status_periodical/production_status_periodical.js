@@ -72,7 +72,13 @@ frappe.query_reports["Production Status Periodical"] = {
 			fieldname: "line",
 			fieldtype: "Link",
 			label: "Line",
-			options: "Facility or Line"
+			options: "Facility or Line",
+			"get_query": function() {
+                let floor = frappe.query_report.get_filter_value("floor");
+                return {
+                    filters: floor ? { "floor": floor } : {}
+                };
+            }
 		},
 		{
 			fieldname: "company",

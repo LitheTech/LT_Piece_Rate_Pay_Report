@@ -52,7 +52,12 @@ frappe.query_reports["Working Sheet"] = {
 			"mandatory": 0,
 			"options": "Facility or Line",
 			"wildcard_filter": 0,
-			"reqd": 1,
+			"get_query": function() {
+                let floor = frappe.query_report.get_filter_value("floor");
+                return {
+                    filters: floor ? { "floor": floor } : {}
+                };
+            }
 		},
         {
 			"fieldname": "process_type",

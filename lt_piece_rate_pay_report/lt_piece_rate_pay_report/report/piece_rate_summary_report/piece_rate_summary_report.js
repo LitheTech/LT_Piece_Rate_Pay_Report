@@ -42,7 +42,13 @@ frappe.query_reports["Piece Rate Summary Report"] = {
 			"label": "Line",
 			"mandatory": 0,
 			"options": "Facility or Line",
-			"wildcard_filter": 0
+			"wildcard_filter": 0,
+            "get_query": function() {
+                let floor = frappe.query_report.get_filter_value("floor");
+                return {
+                    filters: floor ? { "floor": floor } : {}
+                };
+            }
 		},
         {
 			"fieldname": "process_type",
