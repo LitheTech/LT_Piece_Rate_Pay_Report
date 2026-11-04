@@ -38,6 +38,12 @@ frappe.query_reports["Employee Income Details"] = {
             "fieldtype": "Link",
             "options": "Contract Worker Payroll Entry",
             "default": ""
+        },
+        {
+            "fieldname": "total",
+            "label": __("Total"),
+            "fieldtype": "Check",
+            "default": 0
         }
     ]
     
