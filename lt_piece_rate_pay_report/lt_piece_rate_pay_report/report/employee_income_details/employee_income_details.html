@@ -31,9 +31,6 @@
 			{% if (!is_null(filters.to_date)) { %}
 					<th class="text-left">To: {%= filters.to_date %}</th>
 			{% } %}
-			{% if (!is_null(filters.employee)) { %}
-					<th class="text-left">Employee: {%= filters.employee %}</th>
-			{% } %}
 			{% if (!is_null(filters.employee_type)) { %}
 					<th class="text-left">Emp Type: {%= filters.employee_type %}</th>
 			{% } %}
@@ -41,6 +38,13 @@
 					<th class="text-left">Payroll: {%= filters.payroll %}</th>
 			{% } %}
 		</tr>
+		{% if (!is_null(filters.employee)) { %}
+		<tr>
+			<th class="text-left" colspan="2">Emp Name: {%= data[0].employee_name || '' %}</th>
+			<th class="text-left">Emp: {%= filters.employee %}</th>
+			<th class="text-left">Emp Type: {%= data[0].employee_type || '' %}</th>
+		</tr>
+		{% } %}
 		<tr>
 			<th width="50px" style="text-align: center;">Sl No</th>
 			{% for (let i=0, l=report_columns.length; i<l; i++) { %}

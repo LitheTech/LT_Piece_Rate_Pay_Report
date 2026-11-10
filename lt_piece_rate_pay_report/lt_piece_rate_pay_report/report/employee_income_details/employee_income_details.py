@@ -34,6 +34,10 @@ def get_columns(filters=None):
         excluded_fields = ["payroll", "from_date", "to_date"]
         columns = [col for col in columns if col.get("fieldname") not in excluded_fields]
 
+    if filters.get("employee"):
+        employee_fields = ["employee", "employee_name", "employee_type"]
+        columns = [col for col in columns if col.get("fieldname") not in employee_fields]
+
     return columns
 
 
@@ -78,10 +82,8 @@ def get_data(filters):
 def get_conditions(filters):
     conditions = ""
 
-    if filters.get("from_date"):
-        conditions += " cwss.from_date >= '%s'" % filters["from_date"]
-    if filters.get("to_date"):
-        conditions += " AND cwss.to_date <= '%s'" % filters["to_date"]
+    if filters.get("from_date") and filters.get("to_date"):
+        conditions += " cwss.to_date BETWEEN '%s' AND '%s'" % (filters["from_date"], filters["to_date"])
 
     if filters.get("employee"):
         conditions += " AND cwss.employee = '%s'" % filters["employee"]
