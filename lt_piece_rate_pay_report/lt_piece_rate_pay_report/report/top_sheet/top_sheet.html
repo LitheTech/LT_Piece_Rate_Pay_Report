@@ -31,7 +31,9 @@
     }
 
     /* Table body cell styling */
-    td:nth-child(4) {
+    td:nth-child(3),
+    td:nth-child(4),
+    td:nth-child(5) {
         word-break: break-all;
     }
 
@@ -99,7 +101,7 @@
                         <tr>
                             <td colspan="6" style="text-align: center; font-weight: bold;">Total</td>
                             {% for(let i=6, l=report_columns.length; i<l; i++) { %}
-                            {% if (i === l - 1 || i === l - 2) { %}
+                            {% if (i === l - 1 || i === l - 3) { %}
                                 <td style="text-align: center; font-weight: bold;">
                             {% } else { %}
                                 <td style="text-align: center;">
@@ -114,7 +116,7 @@
                         <tr>
                             <td class="text-center">{%= j+1 %}</td>
                             {% for(let i=1, l=report_columns.length; i<l; i++) { %}
-                            {% if (i === l - 1 || i === l - 2) { %}
+                            {% if (i === l - 1 || i === l - 3) { %}
                                 <td style="text-align: center; font-weight: bold;">
                             {% } else { %}
                                 <td style="text-align: center;">
@@ -187,7 +189,7 @@
                     {% } %}     
                 
                         {% for(let i=0, l=report_columns.length; i<l; i++) { %}
-                            {% if (i === l - 1 || i === l - 2) { %}
+                            {% if (i === l - 1 || i === l - 3) { %}
                                 <td style="text-align: center; font-weight: bold;">
                             {% } else { %}
                                 <td style="text-align: center;">
